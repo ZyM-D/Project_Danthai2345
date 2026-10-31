@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naked Bikes – Raw Street Machines</title>
+<style>
+
+/* ===== NAVBAR (shared structure, each page re-themes it with CSS variables) ===== */
+.site-nav{position:sticky;top:0;z-index:100;background:var(--nav-bg,var(--bg));color:var(--nav-fg,var(--text));border-bottom:1px solid var(--line)}
+.nav-in{max-width:1240px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;gap:18px}
+.nav-logo{font-weight:800;letter-spacing:.6px;white-space:nowrap;font-size:16px;color:inherit;text-decoration:none}
+.nav-logo b{color:var(--accent)}
+.menu{display:flex;align-items:center;gap:4px;margin-left:auto}
+.menu>a,.dd-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:var(--nav-radius,8px);font:inherit;font-size:14px;font-weight:600;color:var(--nav-muted,var(--muted));background:none;border:0;cursor:pointer;text-decoration:none;white-space:nowrap}
+.menu>a:hover,.dd-btn:hover,.dd.open .dd-btn{color:var(--nav-fg,var(--text));background:var(--nav-hover,rgba(128,128,128,.14))}
+.menu>a.on,.dd-btn.on{color:var(--nav-fg,var(--text));box-shadow:inset 0 -2px 0 var(--accent)}
+.dd{position:relative}
+.dd-btn svg{transition:transform .2s}
+.dd.open .dd-btn svg{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:var(--nav-pop,var(--panel));border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .18s,transform .18s,visibility .18s}
+.dd.open .dd-menu{opacity:1;visibility:visible;transform:none}
+@media(hover:hover) and (min-width:901px){.dd:hover .dd-menu{opacity:1;visibility:visible;transform:none}.dd:hover .dd-btn svg{transform:rotate(180deg)}}
+.dd-menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--nav-fg,var(--text));text-decoration:none}
+.dd-menu a:hover,.dd-menu a[aria-current]{background:var(--nav-hover,rgba(128,128,128,.14))}
+.dd-menu i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.menu>a.nav-cta{background:var(--accent);color:var(--nav-cta-fg,#04120a);margin-left:8px}
+.menu>a.nav-cta:hover{filter:brightness(1.1);background:var(--accent);color:var(--nav-cta-fg,#04120a)}
+.burger{display:none;margin-left:auto;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:none;cursor:pointer;position:relative;color:var(--nav-fg,var(--text))}
+.burger span{position:absolute;left:11px;right:11px;height:2px;border-radius:2px;background:currentColor;transition:transform .25s,top .25s,opacity .2s}
+.burger span:nth-child(1){top:14px}.burger span:nth-child(2){top:21px}.burger span:nth-child(3){top:28px}
+.burger[aria-expanded="true"] span:nth-child(1){top:21px;transform:rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){top:21px;transform:rotate(-45deg)}
+body.nav-lock{overflow:hidden}
+@media(max-width:900px){
+  .burger{display:block}
+  .menu{position:fixed;top:64px;left:0;right:0;bottom:0;margin:0;flex-direction:column;align-items:stretch;gap:2px;padding:14px 16px 32px;background:var(--bg);overflow-y:auto;transform:translateX(100%);visibility:hidden;transition:transform .3s,visibility .3s}
+  .menu.open{transform:none;visibility:visible}
+  .menu>a,.dd-btn{width:100%;justify-content:space-between;padding:15px 12px;font-size:18px;border-radius:12px}
+  .menu>a.on,.dd-btn.on{box-shadow:none;background:var(--nav-hover,rgba(128,128,128,.14))}
+  .dd-menu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;background:transparent;padding:0 0 0 14px;max-height:0;overflow:hidden;transition:max-height .3s}
+  .dd.open .dd-menu{max-height:340px}
+  .dd-menu a{padding:13px 12px;font-size:16px}
+  .menu>a.nav-cta{margin:12px 0 0;justify-content:center}
+}
+
+/* =====================================================================
+   NAKED PAGE – identity: smoke, steel and amber. Deliberately lopsided:
+   content hugs the left, huge type bleeds off the edge, a vertical label
+   runs down the right, blocks overlap. No centred, symmetrical sections.
+   ===================================================================== */
+:root{
+  --bg:#17181a; --bg2:#1d1f22; --panel:#26292d; --line:#3a3e44;
+  --text:#e9e7e2; --muted:#9a9893;
+  --accent:#ff9f1c;        /* sodium-lamp amber */
+  --rust:#c8442b;
+  --steel:#6d747d;
+  --display:Impact,"Haettenschweiler","Arial Narrow Bold","Arial Black",sans-serif;
+  --nav-bg:#131416; --nav-fg:#e9e7e2; --nav-muted:#9a9893; --nav-pop:#26292d; --nav-hover:rgba(255,159,28,.14); --nav-radius:3px; --nav-cta-fg:#1a1100;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;line-height:1.55;overflow-x:hidden;position:relative}
+/* smoke + grain */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(60vw 50vh at 8% 12%,rgba(130,135,142,.22),transparent 70%),radial-gradient(50vw 45vh at 90% 55%,rgba(255,159,28,.07),transparent 70%),radial-gradient(70vw 40vh at 30% 100%,rgba(110,115,122,.2),transparent 70%)}
+body::after{content:"";position:fixed;inset:0;z-index:50;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--display);text-transform:uppercase;font-weight:400;margin:0;letter-spacing:1px;line-height:.9}
+.site-nav{border-bottom:1px solid var(--line)}
+.nav-logo{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:2px}
+
+/* ---------- HERO (asymmetric) ---------- */
+.hero{position:relative;min-height:88vh;padding:40px 0 70px;overflow:hidden}
+.mega{position:absolute;left:-.04em;top:8px;font-family:var(--display);font-size:clamp(150px,34vw,520px);line-height:.8;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:2px rgba(233,231,226,.22);white-space:nowrap;user-select:none}
+.hero .col{position:relative;margin-left:clamp(18px,7vw,110px);max-width:540px;padding-top:clamp(70px,16vw,230px)}
+.tagline{font-family:var(--display);font-size:clamp(34px,5vw,62px);letter-spacing:1px;line-height:.95}
+.tagline em{color:var(--accent);font-style:normal}
+.hero p{color:#bdbab3;max-width:420px;margin:18px 0 24px}
+.btn{display:inline-block;padding:13px 24px;background:var(--accent);color:#1a1100;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;font-size:13px;border-radius:2px;transition:transform .15s}
+.btn:hover{transform:translate(3px,-3px);box-shadow:-3px 3px 0 var(--rust)}
+.btn.ghost{background:none;color:var(--text);border:1px solid var(--steel);margin-left:10px}
+.hero-bike{position:absolute;right:-30px;bottom:0;width:min(780px,66vw);filter:drop-shadow(0 22px 24px rgba(0,0,0,.6))}
+.vtext{position:absolute;right:14px;top:70px;writing-mode:vertical-rl;font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--muted)}
+.vtext b{color:var(--accent)}
+.stat-stack{position:absolute;left:clamp(18px,7vw,110px);bottom:26px;display:flex;gap:0}
+.stat-stack div{padding:8px 18px 8px 0;margin-right:18px;border-right:1px solid var(--line)}
+.stat-stack div:last-child{border:0}
+.stat-stack b{display:block;font-family:var(--display);font-size:32px;font-weight:400;color:var(--accent);line-height:1}
+.stat-stack span{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+@media(max-width:820px){
+  .hero{min-height:0;padding-bottom:20px}
+  .hero-bike{position:relative;right:-40px;width:125%;display:block;margin-top:-10px}
+  .hero .col{padding-top:130px}
+  .stat-stack{position:static;margin:10px 18px 20px;flex-wrap:wrap}
+  .vtext{display:none}
+}
+
+/* ---------- ANATOMY: sticky text + bleeding diagram ---------- */
+.anat{position:relative;padding:80px 0 90px;display:grid;grid-template-columns:clamp(18px,7vw,110px) minmax(260px,330px) minmax(0,1fr);gap:0}
+.anat-text{grid-column:2;align-self:start;position:sticky;top:90px;z-index:2}
+.eyebrow{font-size:11px;letter-spacing:5px;color:var(--accent);text-transform:uppercase;font-weight:700;margin-bottom:10px;display:block}
+.anat h2{font-size:clamp(46px,6vw,84px);margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--accent);padding:20px 20px 22px;position:relative;box-shadow:12px 12px 0 rgba(0,0,0,.35)}
+.card .num{position:absolute;right:14px;top:6px;font-family:var(--display);font-size:64px;color:rgba(255,159,28,.18);line-height:1}
+.card h3{font-size:30px;margin-bottom:8px;color:var(--accent)}
+.card p{margin:0 0 12px;color:#cfccc5;font-size:15px}
+.spec{display:flex;gap:8px;flex-wrap:wrap}
+.spec span{font-size:11px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--steel);padding:3px 8px;color:#bdbab3}
+.card .hint{margin-top:14px;font-size:12px;color:var(--muted)}
+.anat-art{grid-column:3;margin-right:-60px;margin-left:-30px;position:relative;z-index:1;min-width:0}
+.anat-art svg{width:100%;height:auto;display:block;overflow:visible}
+.co{cursor:pointer}
+.co .ln{stroke:var(--accent);stroke-width:2;stroke-dasharray:4 4}
+.co .ring{fill:rgba(255,159,28,.12);stroke:var(--accent);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:pulse 2.2s ease-out infinite}
+.co .bub{fill:#17181a;stroke:var(--accent);stroke-width:2.5}
+.co text{font:700 14px Helvetica,Arial,sans-serif;fill:var(--accent);text-anchor:middle}
+.co .lab{font:700 11px Helvetica,Arial;letter-spacing:2px;fill:#cfccc5;text-anchor:start;text-transform:uppercase}
+.co.on .bub{fill:var(--accent)}.co.on text:not(.lab){fill:#1a1100}.co.on .lab{fill:var(--accent)}
+@keyframes pulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.1);opacity:0}}
+.part{transition:filter .25s,opacity .25s}
+.dim .part{opacity:.35}
+.dim .part.hl{opacity:1;filter:drop-shadow(0 0 8px rgba(255,159,28,.9))}
+@media(max-width:900px){
+  .anat{grid-template-columns:18px 1fr 18px;padding-top:50px}
+  .anat-text{position:static;grid-column:2;grid-row:2;margin-top:16px}
+  .anat-art{grid-column:1/-1;grid-row:1;margin:0;padding:0 8px}
+  .anat-head{grid-row:0}
+}
+
+/* ---------- ERGONOMICS: offset panel, overlapping ---------- */
+.ergo{position:relative;padding:40px 0 100px}
+.ergo-in{margin-left:clamp(18px,18vw,300px);margin-right:clamp(18px,4vw,60px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:0;align-items:stretch}
+.ergo-head{grid-column:1/-1;margin-left:calc(-1 * clamp(0px,11vw,200px));margin-bottom:22px}
+.ergo-head h2{font-size:clamp(46px,7vw,100px)}
+.ergo-head h2 span{color:var(--accent)}
+.mode{display:inline-flex;margin-top:16px;border:1px solid var(--steel)}
+.mode button{font:inherit;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:12px 20px;background:none;color:var(--text);border:0;cursor:pointer}
+.mode button.on{background:var(--accent);color:#1a1100}
+.posture{align-self:start;background:#101113;border:1px solid var(--line);position:relative;padding:10px;margin-top:40px;margin-right:-36px;z-index:2;box-shadow:-14px 14px 0 rgba(0,0,0,.35)}
+.posture svg{width:100%;height:auto;display:block}
+.rider{transition:transform .6s cubic-bezier(.3,.9,.3,1);transform-box:fill-box}
+#torso,#arm,#head{transition:all .6s cubic-bezier(.3,.9,.3,1)}
+.wind{opacity:0;transition:opacity .5s;stroke:#9aa3ad;stroke-width:3;stroke-linecap:round;stroke-dasharray:18 14;animation:flow 1s linear infinite}
+.long .wind{opacity:.8}
+@keyframes flow{to{stroke-dashoffset:-64}}
+.posture .badge{position:absolute;left:14px;top:12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.posture .badge b{color:var(--accent)}
+.check{background:var(--panel);border:1px solid var(--line);padding:28px 28px 26px 60px;margin-top:0}
+.check h3{font-size:28px;margin-bottom:4px}
+.check .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.check ul{list-style:none;margin:0;padding:0}
+.check li{border-top:1px solid var(--line)}
+.check label{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:12px 0;cursor:pointer}
+.check input{position:absolute;opacity:0}
+.check .bx{width:24px;height:24px;border:2px solid var(--steel);display:grid;place-items:center;transition:all .2s}
+.check .bx::after{content:"";width:10px;height:6px;border-left:3px solid #1a1100;border-bottom:3px solid #1a1100;transform:rotate(-45deg) scale(0);transition:transform .2s;margin-top:-3px}
+.check input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.check input:checked+.bx::after{transform:rotate(-45deg) scale(1)}
+.check input:focus-visible+.bx{outline:2px solid #fff}
+.check b{display:block;font-size:15px}
+.check small{color:var(--muted);font-size:13px}
+.score{display:flex;align-items:center;gap:16px;margin-top:10px;padding-top:16px;border-top:2px solid var(--accent)}
+.score .big{font-family:var(--display);font-size:56px;color:var(--accent);line-height:1}
+.score .meter{flex:1;height:8px;background:#111;position:relative}
+.score .meter i{position:absolute;inset:0 auto 0 0;background:var(--accent);width:0;transition:width .5s}
+.verdict{margin:12px 0 0;font-size:14px;color:#cfccc5;min-height:44px}
+@media(max-width:900px){
+  .ergo-in{grid-template-columns:1fr;margin:0 18px}
+  .ergo-head{margin-left:0}
+  .posture{margin:0 0 -1px;margin-right:0;box-shadow:none}
+  .check{padding:22px 18px}
+}
+
+/* ---------- PHOTO WALL ---------- */
+.wall{position:relative;padding:30px 0 110px;overflow:hidden}
+.wall-h{margin-left:clamp(18px,7vw,110px);margin-bottom:26px;max-width:520px}
+.wall-h h2{font-size:clamp(46px,7vw,100px)}
+.wall-h p{color:var(--muted);margin:8px 0 0}
+.collage{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:70px;gap:14px;padding:0 clamp(14px,3vw,40px) 0 clamp(14px,5vw,80px)}
+.ph{position:relative;border:0;padding:0;background:#0d0e10;cursor:pointer;color:inherit;font:inherit;text-align:left;transform:rotate(var(--r,0deg));transition:transform .3s,z-index 0s,box-shadow .3s;box-shadow:8px 10px 0 rgba(0,0,0,.4);outline:6px solid #e9e7e2;outline-offset:-6px;border:6px solid #e9e7e2}
+.ph svg{display:block;width:100%;height:100%}
+.ph:hover,.ph:focus-visible{transform:rotate(0) scale(1.04);z-index:5}
+.ph .cap{position:absolute;left:0;bottom:0;right:0;padding:14px 10px 6px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#fff;opacity:0;transition:opacity .25s}
+.ph:hover .cap,.ph:focus-visible .cap{opacity:1}
+.ph::before{content:"";position:absolute;left:50%;top:-14px;width:54px;height:20px;margin-left:-27px;background:rgba(255,159,28,.55);transform:rotate(-3deg);z-index:2}
+.p1{grid-column:1/6;grid-row:1/6;--r:-1.5deg}
+.p2{grid-column:6/9;grid-row:2/5;--r:2deg}
+.p3{grid-column:9/13;grid-row:1/4;--r:-1deg}
+.p4{grid-column:7/10;grid-row:5/8;--r:-2.5deg}
+.p5{grid-column:1/4;grid-row:6/10;--r:2deg}
+.p6{grid-column:4/7;grid-row:6/9;--r:-1deg}
+.p7{grid-column:10/13;grid-row:4/9;--r:1.5deg}
+.p8{grid-column:4/8;grid-row:9/12;--r:-1.5deg}
+.p9{grid-column:8/13;grid-row:9/12;--r:1deg}
+@media(max-width:760px){
+  .collage{grid-template-columns:repeat(2,1fr);grid-auto-rows:120px;padding:0 16px}
+  .ph{grid-column:auto!important;grid-row:auto!important}
+  .p1,.p9{grid-column:1/-1!important;grid-row:span 2!important}
+  .p5,.p7{grid-row:span 2!important}
+}
+.lb{position:fixed;inset:0;z-index:200;background:rgba(10,10,11,.92);display:none;align-items:center;justify-content:center;padding:20px}
+.lb.open{display:flex}
+.lb figure{margin:0;width:min(900px,100%);border:8px solid #e9e7e2;background:#000;position:relative}
+.lb figure svg{display:block;width:100%;height:auto;max-height:70vh}
+.lb figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 16px 12px;background:linear-gradient(transparent,rgba(0,0,0,.9));font-size:13px;letter-spacing:2px;text-transform:uppercase}
+.lb button{position:absolute;background:var(--accent);color:#1a1100;border:0;width:46px;height:46px;font-size:22px;font-weight:800;cursor:pointer}
+.lb .x{top:14px;right:14px}.lb .pv{left:14px;top:50%}.lb .nx{right:14px;top:50%}
+
+footer{border-top:1px solid var(--line);padding:26px 0 26px clamp(18px,7vw,110px);color:var(--muted);font-size:13px}
+footer a{color:var(--text);margin-right:16px}
+.reveal{opacity:0;transform:translateX(-26px);transition:opacity .7s,transform .7s}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- ===== SHARED NAVBAR: Brands dropdown + category links + mobile menu ===== -->
+<header class="site-nav" id="siteNav">
+  <div class="nav-in">
+    <a class="nav-logo" href="home.html">BIG<b>BIKE</b> WORLD</a>
+    <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
+    <nav class="menu" id="navMenu" aria-label="Main">
+      <a href="home.html">Home</a>
+      <div class="dd">
+        <button class="dd-btn" type="button" aria-haspopup="true" aria-expanded="false">Brands
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="dd-menu" role="menu"><a href="honda.html" role="menuitem" style="--c:#e60012"><i></i>Honda</a><a href="yamaha.html" role="menuitem" style="--c:#4a74ff"><i></i>Yamaha</a><a href="suzuki.html" role="menuitem" style="--c:#4a8bff"><i></i>Suzuki</a><a href="bmw.html" role="menuitem" style="--c:#2d8cff"><i></i>BMW</a><a href="kawasaki.html" role="menuitem" style="--c:#5bd10a"><i></i>Kawasaki</a></div>
+      </div>
+      <a href="sport.html">Sport Bike</a><a href="naked.html" class="on" aria-current="page">Naked Bike</a><a href="scooter.html">Scooter</a>
+      <a class="nav-cta" href="cbr250rr.html">Exploded view →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== HERO: lopsided, giant outlined word bleeding off the left ===== -->
+<header class="hero">
+  <div class="mega" aria-hidden="true">NAKED</div>
+  <div class="vtext"><b>●</b> No fairing &nbsp; / &nbsp; No excuses &nbsp; / &nbsp; Street built</div>
+  <div class="col">
+    <span class="eyebrow">Class · Naked / Streetfighter</span>
+    <div class="tagline">Strip it.<br><em>Show the machine.</em></div>
+    <p>A naked bike removes the plastic and leaves the engine, frame and brakes in plain sight. Upright, loud, light and quick in town.</p>
+    <a class="btn" href="#anatomy">Open the engine bay</a><a class="btn ghost" href="#ergo">Check your posture</a>
+  </div>
+  <svg class="hero-bike" viewBox="0 0 720 400" role="img" aria-label="Naked bike"><use href="#nk"/></svg>
+  <div class="stat-stack"><div><b>140+</b><span>hp · big nakeds</span></div><div><b>~190 kg</b><span>wet weight</span></div><div><b>800 mm</b><span>typical seat</span></div></div>
+</header>
+
+<!-- Shared drawing of the naked bike (facing left). Used in hero + anatomy. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e9ee"/><stop offset=".5" stop-color="#7d8590"/><stop offset="1" stop-color="#c3c8d0"/></linearGradient>
+    <linearGradient id="eng" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5c636d"/><stop offset=".5" stop-color="#2b2f35"/><stop offset="1" stop-color="#15171a"/></linearGradient>
+    <linearGradient id="tank" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#e5780b"/><stop offset="1" stop-color="#6d2f00"/></linearGradient>
+    <g id="wh">
+      <circle r="72" fill="#0b0c0e"/><circle r="62" fill="none" stroke="#2a2d33" stroke-width="3" stroke-dasharray="3 3"/>
+      <circle r="50" fill="none" stroke="#8c939d" stroke-width="6"/>
+      <g stroke="#a3aab4" stroke-width="5" stroke-linecap="round"><line y1="-12" y2="-48"/><line y1="-12" y2="-48" transform="rotate(60)"/><line y1="-12" y2="-48" transform="rotate(120)"/><line y1="-12" y2="-48" transform="rotate(180)"/><line y1="-12" y2="-48" transform="rotate(240)"/><line y1="-12" y2="-48" transform="rotate(300)"/></g>
+      <circle r="11" fill="url(#steel)"/>
+    </g>
+    <g id="nk">
+      <ellipse cx="360" cy="352" rx="330" ry="9" fill="#000" opacity=".5"/>
+      <g class="part" data-p="swing"><path d="M392 262 L585 282" stroke="#16181b" stroke-width="18" stroke-linecap="round"/><path d="M396 258 L580 276" stroke="#6b727c" stroke-width="2"/></g>
+      <use href="#wh" x="590" y="282"/>
+      <use href="#wh" x="140" y="282"/>
+      <g class="part" data-p="fork"><line x1="200" y1="122" x2="150" y2="276" stroke="#caa24a" stroke-width="12" stroke-linecap="round"/><line x1="206" y1="122" x2="156" y2="276" stroke="#15171a" stroke-width="12" stroke-linecap="round"/><line x1="198" y1="168" x2="162" y2="278" stroke="url(#steel)" stroke-width="9" stroke-linecap="round"/></g>
+      <g class="part" data-p="brake"><circle cx="140" cy="282" r="30" fill="none" stroke="#b6bcc6" stroke-width="5"/><circle cx="140" cy="282" r="30" fill="none" stroke="#17181a" stroke-width="3" stroke-dasharray="3 5"/><rect x="156" y="250" width="22" height="34" rx="5" fill="#e23b2b" stroke="#6e1308" stroke-width="2" transform="rotate(14 167 267)"/></g>
+      <g class="part" data-p="frame"><path d="M214 140 L300 126 L470 134 L520 150" fill="none" stroke="#d9a53a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M214 148 L300 220 L420 262" fill="none" stroke="#d9a53a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M300 130 L360 190 L430 140 M360 190 L420 250 M470 136 L420 252 M520 152 L410 262" fill="none" stroke="#d9a53a" stroke-width="4" stroke-linecap="round"/><circle cx="408" cy="262" r="10" fill="#222" stroke="#d9a53a" stroke-width="3"/></g>
+      <g class="part" data-p="exhaust"><path d="M300 222 C280 260 290 310 360 318 C440 326 520 300 640 262" fill="none" stroke="#2a2d32" stroke-width="20" stroke-linecap="round"/><path d="M300 222 C280 260 290 310 360 318 C440 326 520 300 640 262" fill="none" stroke="url(#steel)" stroke-width="12" stroke-linecap="round"/><path d="M330 224 C320 255 330 295 380 302" fill="none" stroke="url(#steel)" stroke-width="9" stroke-linecap="round"/><rect x="520" y="268" width="130" height="34" rx="17" fill="url(#steel)" stroke="#555a62" stroke-width="2" transform="rotate(-9 585 285)"/><ellipse cx="646" cy="260" rx="6" ry="15" fill="#111" stroke="#c9d0da" stroke-width="2" transform="rotate(-9 646 260)"/></g>
+      <g class="part" data-p="engine">
+        <path d="M284 150 L370 138 L396 214 L296 228 Z" fill="url(#eng)" stroke="#505660" stroke-width="2"/>
+        <g stroke="#0f1013" stroke-width="3"><line x1="290" y1="162" x2="378" y2="150"/><line x1="291" y1="172" x2="381" y2="160"/><line x1="292" y1="182" x2="384" y2="170"/><line x1="293" y1="192" x2="387" y2="180"/><line x1="294" y1="202" x2="390" y2="190"/></g>
+        <path d="M268 222 L430 214 Q452 228 440 262 L286 276 Q264 258 268 222 Z" fill="url(#eng)" stroke="#505660" stroke-width="2"/>
+        <circle cx="330" cy="248" r="26" fill="#3a3f47" stroke="#8c939d" stroke-width="3"/><circle cx="330" cy="248" r="10" fill="#15171a"/><circle cx="330" cy="248" r="18" fill="none" stroke="#15171a" stroke-width="2" stroke-dasharray="3 4"/>
+        <rect x="380" y="236" width="48" height="30" rx="6" fill="#23262b" stroke="#6d747d"/>
+        <rect x="296" y="124" width="70" height="14" rx="4" fill="#23262b" stroke="#6d747d" stroke-width="2" transform="rotate(-8 330 131)"/>
+      </g>
+      <g class="part" data-p="tank"><path d="M222 120 Q300 90 396 112 L424 148 L340 160 L228 150 Z" fill="url(#tank)" stroke="#5a2600" stroke-width="2"/><path d="M240 120 Q310 102 388 118" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3"/></g>
+      <g class="part" data-p="seat"><path d="M420 128 L560 116 Q610 108 650 100 L640 118 Q600 138 560 140 L430 150 Z" fill="#14151a" stroke="#3a3e46" stroke-width="2"/><path d="M560 116 L650 100 L664 106 L640 118" fill="#e5780b"/></g>
+      <g class="part" data-p="light"><circle cx="196" cy="126" r="32" fill="#14151a" stroke="#8c939d" stroke-width="5"/><circle cx="192" cy="126" r="22" fill="#fff6d0"/><circle cx="192" cy="126" r="22" fill="none" stroke="#e8c866" stroke-width="2"/><circle cx="192" cy="126" r="9" fill="#ffd45e"/></g>
+      <g class="part" data-p="bars"><path d="M232 100 L270 88" stroke="#15171a" stroke-width="9" stroke-linecap="round"/><line x1="268" y1="88" x2="292" y2="84" stroke="#0a0a0b" stroke-width="12" stroke-linecap="round"/><circle cx="236" cy="104" r="12" fill="#23262b" stroke="#6d747d" stroke-width="2"/><rect x="224" y="82" width="22" height="14" rx="4" fill="#23262b" stroke="#8c939d"/></g>
+    </g>
+  </defs>
+</svg>
+
+<!-- ===== ANATOMY: sticky left card, bleeding diagram on the right ===== -->
+<section id="anatomy" class="anat">
+  <div class="anat-text reveal">
+    <span class="eyebrow">Exposed · Nothing to hide</span>
+    <h2 class="anat-head">Engine<br>&amp; frame</h2>
+    <div class="card" id="card" aria-live="polite">
+      <span class="num" id="cNum">1</span>
+      <h3 id="cT"></h3><p id="cP"></p><div class="spec" id="cS"></div>
+      <div class="hint">Tap a numbered callout on the bike.</div>
+    </div>
+  </div>
+  <div class="anat-art">
+    <svg id="anatSvg" viewBox="0 0 720 400" role="img" aria-label="Exposed engine and frame with numbered callouts">
+      <g id="anatBike"></g>
+      <g id="callouts"></g>
+    </svg>
+  </div>
+</section>
+
+<!-- ===== ERGONOMICS ===== -->
+<section id="ergo" class="ergo">
+  <div class="ergo-in">
+    <div class="ergo-head reveal">
+      <span class="eyebrow">Interactive · Ergonomics</span>
+      <h2>How does it<br><span>sit?</span></h2>
+      <div class="mode" role="group" aria-label="Riding style"><button class="on" data-m="urban">Urban commuting</button><button data-m="long">Long distance</button></div>
+    </div>
+    <div class="posture reveal" id="posture">
+      <div class="badge">Rider posture · <b id="pMode">Urban</b></div>
+      <svg viewBox="0 30 520 270" role="img" aria-label="Rider posture diagram">
+        <g transform="translate(20,80) scale(.62)"><use href="#nk" opacity=".55"/></g>
+        <g id="wind"><line class="wind" x1="470" y1="70" x2="330" y2="70"/><line class="wind" x1="500" y1="100" x2="330" y2="100" style="animation-duration:.8s"/><line class="wind" x1="490" y1="130" x2="340" y2="130" style="animation-duration:1.2s"/></g>
+        <!-- rider: hip at (322,168), pegs at (270,230) -->
+        <line x1="322" y1="168" x2="262" y2="190" stroke="#e9e7e2" stroke-width="14" stroke-linecap="round"/>
+        <line x1="262" y1="190" x2="268" y2="236" stroke="#e9e7e2" stroke-width="12" stroke-linecap="round"/>
+        <line id="torso" x1="322" y1="168" x2="304" y2="86" stroke="#ff9f1c" stroke-width="22" stroke-linecap="round"/>
+        <line id="arm" x1="304" y1="96" x2="190" y2="134" stroke="#e9e7e2" stroke-width="10" stroke-linecap="round"/>
+        <circle id="head" cx="306" cy="58" r="19" fill="#e9e7e2"/>
+        <circle cx="322" cy="168" r="7" fill="#17181a"/>
+      </svg>
+    </div>
+    <div class="check reveal">
+      <h3 id="cH">Urban check</h3><p class="sub" id="cSub">Tick what the bike offers for stop-start city riding.</p>
+      <ul id="checks"></ul>
+      <div class="score"><div class="big" id="scN">0/6</div><div class="meter"><i id="scBar"></i></div></div>
+      <p class="verdict" id="verdict"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PHOTO WALL ===== -->
+<section class="wall">
+  <div class="wall-h reveal"><span class="eyebrow">Street · Photo wall</span><h2>After<br>dark</h2><p>Illustrated stand-ins for real street photos. Tap any print to enlarge.</p></div>
+  <div class="collage" id="collage"></div>
+</section>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer"><figure><div id="lbArt"></div><figcaption id="lbCap"></figcaption><button class="x" id="lbX" aria-label="Close">×</button><button class="pv" id="lbP" aria-label="Previous">‹</button><button class="nx" id="lbN" aria-label="Next">›</button></figure></div>
+
+<footer><a href="home.html">Home</a><a href="sport.html">Sport Bike</a><a href="scooter.html">Scooter</a> · Example page, figures are approximate, no logos used.</footer>
+
+<script>
+
+// ===== NAVBAR behaviour: dropdown, mobile menu, Esc / outside click to close =====
+(function(){
+  const nav = document.getElementById('siteNav'); if (!nav) return;
+  const burger = nav.querySelector('.burger'), menu = nav.querySelector('.menu');
+  const dds = [...nav.querySelectorAll('.dd')];
+  function closeDropdowns(){ dds.forEach(d => { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded','false'); }); }
+  function closeMenu(){ menu.classList.remove('open'); burger.setAttribute('aria-expanded','false'); burger.setAttribute('aria-label','Open menu'); document.body.classList.remove('nav-lock'); }
+  burger.addEventListener('click', () => {
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open); burger.setAttribute('aria-expanded', open);
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('nav-lock', open);
+  });
+  dds.forEach(d => {
+    const b = d.querySelector('.dd-btn');
+    b.addEventListener('click', e => { e.stopPropagation(); const open = !d.classList.contains('open'); closeDropdowns(); d.classList.toggle('open', open); b.setAttribute('aria-expanded', open); });
+  });
+  document.addEventListener('click', e => { if (!nav.contains(e.target)) closeDropdowns(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ closeDropdowns(); closeMenu(); } });
+  matchMedia('(min-width:901px)').addEventListener('change', e => { if (e.matches) closeMenu(); });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+})();
+
+
+// ===================================================================
+// 1) ANATOMY CALLOUTS
+// x,y = point on the bike, lx,ly = where the number bubble sits.
+// p = which drawn part to highlight (data-p in the SVG symbol).
+// ===================================================================
+const PARTS = [
+  {x:460,y:136,lx:520,ly:62, p:'frame',  t:'Trellis frame', d:'A web of steel tubes triangulated for stiffness at low weight. Left uncovered, it is also part of the look.', s:['Steel tube','Light','Rigid']},
+  {x:340,y:240,lx:350,ly:370,p:'engine', t:'Inline engine',  d:'The motor is the centrepiece. Cooling fins, cases and the sprocket are all visible. Strong midrange makes city roll-ons effortless.', s:['Inline 3 / 4','Torquey','Air + liquid cooled']},
+  {x:170,y:200,lx:92, ly:62, p:'fork',   t:'USD fork',       d:'Upside-down forks put the thick tube at the top, so they flex less under braking and steer more precisely.', s:['Upside-down','Adjustable','Gold finish']},
+  {x:296,y:292,lx:200,ly:372,p:'exhaust',t:'Header pipes',   d:'Exposed exhaust runs sweep down from the cylinders. Visible and vocal, they set the bike’s sound.', s:['Stainless','Under-belly','Sound']},
+  {x:166,y:268,lx:80, ly:300,p:'brake',  t:'Radial brake',   d:'Radially mounted calipers bite the disc evenly with a firm lever feel, so stopping power is easy to measure out.', s:['4-piston','Twin disc','ABS']},
+  {x:196,y:126,lx:150,ly:30, p:'light',  t:'Round headlight',d:'A single round LED lamp is the face of the bike. Its simple shape is a classic naked bike signature.', s:['LED','Round','Compact']},
+  {x:270,y:88, lx:300,ly:36, p:'bars',   t:'Wide handlebar', d:'A wide, tall bar gives leverage for quick direction changes and an upright, relaxed back.', s:['Tapered','Upright','Leverage']}
+];
+const coG = document.getElementById('callouts'), svg = document.getElementById('anatSvg');
+// copy the bike drawing into this svg so highlighting here doesn't affect the hero bike
+document.getElementById('anatBike').innerHTML = document.getElementById('nk').innerHTML;
+PARTS.forEach((c, i) => {
+  coG.insertAdjacentHTML('beforeend', `<g class="co" data-i="${i}" tabindex="0" role="button" aria-label="${c.t}">
+    <line class="ln" x1="${c.x}" y1="${c.y}" x2="${c.lx}" y2="${c.ly}"/>
+    <circle class="ring" cx="${c.x}" cy="${c.y}" r="9"/><circle cx="${c.x}" cy="${c.y}" r="4.5" fill="#ff9f1c"/>
+    <circle class="bub" cx="${c.lx}" cy="${c.ly}" r="16"/><text x="${c.lx}" y="${c.ly + 5}">${i + 1}</text></g>`);
+});
+function showPart(i){
+  const c = PARTS[i];
+  document.getElementById('cNum').textContent = i + 1;
+  document.getElementById('cT').textContent = c.t;
+  document.getElementById('cP').textContent = c.d;
+  document.getElementById('cS').innerHTML = c.s.map(s => `<span>${s}</span>`).join('');
+  document.querySelectorAll('.co').forEach(g => g.classList.toggle('on', +g.dataset.i === i));
+  svg.classList.add('dim');
+  // highlight the matching drawn part inside the <use> shadow: use a clone-free approach by toggling a class on the symbol group
+  document.querySelectorAll('#anatBike .part').forEach(g => g.classList.toggle('hl', g.dataset.p === c.p));
+}
+coG.addEventListener('click', e => { const g = e.target.closest('.co'); if (g) showPart(+g.dataset.i); });
+coG.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ const g = e.target.closest('.co'); if (g){ e.preventDefault(); showPart(+g.dataset.i); } } });
+showPart(1);
+
+// ===================================================================
+// 2) ERGONOMICS CHECKLIST – two riding modes
+// ===================================================================
+const ERGO = {
+  urban:{h:'Urban check', sub:'Tick what the bike offers for stop-start city riding.', label:'Urban',
+    // torso end point (shoulder), head, arm hand – upright posture
+    torso:[304,86], head:[306,58], arm:[190,134],
+    items:[['Upright back','Bars high and wide, so the spine stays straight and eyes stay level with traffic.'],['Narrow body','Slim tank and tail make filtering between cars possible.'],['Seat height under 810 mm','Both feet reach the floor at red lights.'],['Light clutch','Fewer hand cramps in stop-and-go traffic.'],['Tight turning circle','Easy U-turns and parking-lot manoeuvres.'],['Clear mirrors','Wide bars and bar-end mirrors show the lane behind.']],
+    v:['Not a city bike yet. Look for lower seat, lighter clutch.','Workable around town, but some compromises.','Great urban companion.','Born for the city grid.']},
+  long:{h:'Long-distance check', sub:'Tick what matters for hours in the saddle.', label:'Long distance',
+    torso:[270,92], head:[262,66], arm:[190,136],
+    items:[['Padded seat','A wider, firmer seat spreads weight for hours.'],['Wind protection','A small screen or flyscreen takes load off the chest and neck.'],['Fuel range 250 km+','A big tank means fewer stops.'],['Cruise control','Rest your throttle hand on the motorway.'],['Comfortable peg angle','Knees not folded tightly, so legs stay fresh.'],['Relaxed reach to bars','Arms slightly bent; shoulders not stretched.']],
+    v:['Tiring over distance. Plan breaks, or add a screen.','Fine for day rides with stops.','Good tourer for a naked.','Naked bike, tourer manners.']}
+};
+let mode = 'urban';
+const checksEl = document.getElementById('checks');
+function renderChecks(){
+  const m = ERGO[mode];
+  document.getElementById('cH').textContent = m.h; document.getElementById('cSub').textContent = m.sub; document.getElementById('pMode').textContent = m.label;
+  checksEl.innerHTML = m.items.map((it, i) => `<li><label><input type="checkbox" data-i="${i}"><span class="bx"></span><span><b>${it[0]}</b><small>${it[1]}</small></span></label></li>`).join('');
+  // move rider pose
+  const t = document.getElementById('torso'), h = document.getElementById('head'), a = document.getElementById('arm');
+  t.setAttribute('x2', m.torso[0]); t.setAttribute('y2', m.torso[1]);
+  h.setAttribute('cx', m.head[0]); h.setAttribute('cy', m.head[1]);
+  a.setAttribute('x1', m.torso[0]); a.setAttribute('y1', m.torso[1] + 10); a.setAttribute('x2', m.arm[0]); a.setAttribute('y2', m.arm[1]);
+  document.getElementById('posture').classList.toggle('long', mode === 'long');
+  score();
+}
+function score(){
+  const n = checksEl.querySelectorAll('input:checked').length, tot = 6;
+  document.getElementById('scN').textContent = n + '/' + tot;
+  document.getElementById('scBar').style.width = (n / tot * 100) + '%';
+  const v = ERGO[mode].v; document.getElementById('verdict').textContent = v[n <= 1 ? 0 : n <= 3 ? 1 : n <= 5 ? 2 : 3];
+}
+checksEl.addEventListener('change', score);
+document.querySelectorAll('.mode button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.m; document.querySelectorAll('.mode button').forEach(x => x.classList.toggle('on', x === b)); renderChecks();
+}));
+renderChecks();
+
+// ===================================================================
+// 3) PHOTO WALL – generated SVG "street photos" + lightbox
+// ===================================================================
+function rnd(seed){ let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+const SCENES = [
+  ['Night crossing',['#0b1020','#3a2a55'],'#ffcf6b',1], ['Rain neon alley',['#06141a','#0f3a46'],'#27d9ff',2],
+  ['Rooftop sunset',['#ff8a3d','#3a1038'],'#fff1b0',3],  ['Graffiti wall',['#2b2e33','#14161a'],'#ff4d6d',4],
+  ['Tunnel run',['#111','#2c2418'],'#ff9f1c',5],         ['Harbour lights',['#071526','#17405f'],'#7ee0ff',6],
+  ['Parking deck',['#1c1d20','#34363b'],'#e9e7e2',7],    ['Downtown dusk',['#2a1b47','#d4577b'],'#ffd9a0',8],
+  ['Last light',['#1a0f0a','#7a3b12'],'#ffb347',9]
+];
+function scene(sc, uid){
+  const [name, [c1, c2], glow, seed] = sc, r = rnd(seed * 97);
+  let b = '', x = 0;
+  while (x < 400){ const w = 28 + r() * 46, h = 60 + r() * 130; b += `<rect x="${x}" y="${230 - h}" width="${w - 3}" height="${h}" fill="#0a0b0e" opacity=".9"/>`;
+    for (let k = 0; k < 7; k++){ if (r() > .45) b += `<rect x="${x + 4 + r() * (w - 14)}" y="${230 - h + 8 + r() * (h - 20)}" width="4" height="5" fill="${glow}" opacity="${.4 + r() * .6}"/>`; } x += w; }
+  return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="sk${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient><radialGradient id="gl${uid}"><stop offset="0" stop-color="${glow}" stop-opacity=".7"/><stop offset="1" stop-color="${glow}" stop-opacity="0"/></radialGradient></defs>
+    <rect width="400" height="300" fill="url(#sk${uid})"/><circle cx="${60 + r() * 280}" cy="${60 + r() * 60}" r="60" fill="url(#gl${uid})"/>${b}
+    <rect y="228" width="400" height="72" fill="#0d0e10"/><rect y="228" width="400" height="3" fill="${glow}" opacity=".5"/>
+    <ellipse cx="${150 + r() * 100}" cy="262" rx="80" ry="8" fill="${glow}" opacity=".25"/>
+    <g transform="translate(${130 + r() * 100},196) scale(.34)" opacity=".95"><use href="#nk" fill="#000"/></g>
+    <rect width="400" height="300" fill="${c1}" opacity=".12"/></svg>`;
+}
+const collage = document.getElementById('collage');
+SCENES.forEach((sc, i) => collage.insertAdjacentHTML('beforeend', `<button class="ph p${i + 1}" data-i="${i}" aria-label="Open photo: ${sc[0]}">${scene(sc, i)}<span class="cap">${sc[0]}</span></button>`));
+const lb = document.getElementById('lb'); let cur = 0;
+function openLb(i){ cur = (i + SCENES.length) % SCENES.length; document.getElementById('lbArt').innerHTML = scene(SCENES[cur], 'L' + cur); document.getElementById('lbCap').textContent = SCENES[cur][0] + ' · ' + (cur + 1) + '/' + SCENES.length; lb.classList.add('open'); }
+collage.addEventListener('click', e => { const p = e.target.closest('.ph'); if (p) openLb(+p.dataset.i); });
+document.getElementById('lbX').onclick = () => lb.classList.remove('open');
+document.getElementById('lbP').onclick = () => openLb(cur - 1);
+document.getElementById('lbN').onclick = () => openLb(cur + 1);
+lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'Escape') lb.classList.remove('open'); if (e.key === 'ArrowLeft') openLb(cur - 1); if (e.key === 'ArrowRight') openLb(cur + 1); });
+
+// reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suzuki – Story &amp; History</title>
+<style>
+  :root{--bg:#0b0f14;--bg2:#10161d;--panel:#161b22;--line:#2a313c;--text:#e6edf3;--muted:#8b96a5;--accent:#3ddc6c;--brand:#3ddc6c}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  section{padding:64px 0}
+  h2.title{font-size:clamp(26px,4vw,36px);margin:0 0 8px;letter-spacing:-.5px}
+  p.sub{color:var(--muted);margin:0 0 28px;max-width:640px}
+  .eyebrow{color:var(--brand);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+
+  /* ===== NAV (same on every page) ===== */
+  nav.top{position:sticky;top:0;z-index:20;background:rgba(11,15,20,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav.top .wrap{display:flex;align-items:center;gap:16px;height:60px}
+  .logo{font-weight:800;letter-spacing:.5px;white-space:nowrap}
+  .logo span{color:var(--accent)}
+  nav.top ul{display:flex;gap:4px;list-style:none;margin:0 auto;padding:0;overflow-x:auto;scrollbar-width:none}
+  nav.top ul a{display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:var(--muted);white-space:nowrap}
+  nav.top ul a:hover{color:var(--text);background:var(--panel)}
+  nav.top ul a.on{color:var(--text);background:var(--panel);box-shadow:inset 0 -2px 0 var(--c,var(--accent))}
+  .cta{background:var(--accent);color:#04120a;font-weight:700;padding:8px 14px;border-radius:8px;font-size:14px;white-space:nowrap}
+  @media(max-width:860px){.cta{display:none}nav.top ul{margin:0}}
+
+  .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+  .btn{display:inline-block;padding:12px 20px;border-radius:10px;font-weight:700;font-size:15px;border:1px solid var(--line);background:var(--panel);transition:transform .15s,border-color .15s}
+  .btn:hover{transform:translateY(-2px);border-color:var(--brand)}
+  .btn.primary{background:var(--brand);color:#04120a;border-color:var(--brand)}
+
+  .grid{display:grid;gap:14px}
+  .g5{grid-template-columns:repeat(5,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:1000px){.g5{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:700px){.g5,.g3{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.g5,.g3{grid-template-columns:1fr}}
+  .card{position:relative;display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;color:inherit}
+  .card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:var(--c,var(--accent))}
+  a.card:hover{transform:translateY(-4px);border-color:var(--c,var(--accent));box-shadow:0 12px 30px rgba(0,0,0,.4)}
+  .mono{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;background:var(--c,var(--accent));margin-bottom:12px}
+  .card h3{margin:0;font-size:19px}
+  .card small{color:var(--muted);display:block;margin-top:2px}
+  .card p{color:#b7c1cd;font-size:14px;margin:10px 0 0}
+  .card .more{margin-top:12px;font-size:13px;font-weight:700;color:var(--c,var(--accent))}
+
+  .banner{background:linear-gradient(120deg,#12351f,#0f1a14 60%);border:1px solid #1f4a2c;border-radius:20px;padding:34px;display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .banner h3{margin:0 0 6px;font-size:26px}
+  .banner p{margin:0;color:#b7c1cd}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:13px}
+
+  :root{--brand:#2f6fe0;--bt:#7aa8ff;--on:#fff}
+  .hero{padding:56px 0 44px;background:radial-gradient(900px 380px at 80% 0%,color-mix(in srgb,var(--brand) 28%,transparent),transparent 70%),var(--bg);border-bottom:1px solid var(--line)}
+  .hero .wrap{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+  .big{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;font-size:52px;font-weight:800;color:#fff;background:var(--brand);box-shadow:0 0 0 8px color-mix(in srgb,var(--brand) 25%,transparent)}
+  .hero h1{margin:0;font-size:clamp(40px,7vw,72px);letter-spacing:-2px;line-height:1}
+  .hero .tag{color:#b7c1cd;font-size:19px;margin-top:6px}
+  .facts{display:grid;width:100%;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:28px}
+  @media(max-width:760px){.facts{grid-template-columns:repeat(2,1fr)}}
+  .fact{background:rgba(22,27,34,.8);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .fact span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  .fact b{font-size:15px}
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:34px}
+  @media(max-width:860px){.cols{grid-template-columns:1fr}}
+  .cols p{color:#c4ccd6;font-size:17px;margin:0 0 14px}
+  ul.tick{list-style:none;padding:0;margin:0}
+  ul.tick li{position:relative;padding:12px 14px 12px 40px;margin-bottom:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:15px;color:#c4ccd6}
+  ul.tick li::before{content:"✓";position:absolute;left:14px;top:11px;color:var(--bt);font-weight:800}
+  .card small{text-transform:uppercase;letter-spacing:1px;font-size:11px;color:var(--bt)}
+  .eyebrow{color:var(--bt)}
+  .btn.primary{color:var(--on)}
+  .card h3{margin-top:4px}
+  /* ===== TIMELINE ===== */
+  .tl{position:relative;max-width:900px;margin:0 auto}
+  .tl::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--line);transform:translateX(-50%)}
+  .ev{position:relative;width:50%;padding:0 34px 28px 0;opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+  .ev.show{opacity:1;transform:none}
+  .ev:nth-child(even){margin-left:50%;padding:0 0 28px 34px}
+  .ev::after{content:"";position:absolute;right:-7px;top:10px;width:14px;height:14px;border-radius:50%;background:var(--brand);border:3px solid var(--bg)}
+  .ev:nth-child(even)::after{right:auto;left:-7px}
+  .ev .box{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px}
+  .ev .y{font-size:26px;font-weight:800;color:var(--bt);line-height:1}
+  .ev h5{margin:6px 0 4px;font-size:16px}
+  .ev p{margin:0;font-size:14px;color:#b7c1cd}
+  @media(max-width:700px){.tl::before{left:8px}.ev,.ev:nth-child(even){width:100%;margin-left:0;padding:0 0 22px 34px}.ev::after,.ev:nth-child(even)::after{left:1px;right:auto}}
+  .pn{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .pn a{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-weight:700}
+  .pn a:hover{border-color:var(--brand)}
+  .pn small{display:block;color:var(--muted);font-weight:400}
+</style>
+</head>
+<body>
+<!-- ===== TOP NAV (same on every page) ===== -->
+<nav class="top"><div class="wrap">
+  <a href="home.html" class="logo">BIG<span>BIKE</span> WORLD</a>
+  <ul><li><a href="home.html" style="--c:#3ddc6c">Home</a></li><li><a href="honda.html" style="--c:#e60012">Honda</a></li><li><a href="yamaha.html" style="--c:#1f4fd8">Yamaha</a></li><li><a href="suzuki.html" style="--c:#2f6fe0" class="on">Suzuki</a></li><li><a href="bmw.html" style="--c:#2d8cff">BMW</a></li><li><a href="kawasaki.html" style="--c:#5bd10a">Kawasaki</a></li></ul>
+  <a class="cta" href="cbr250rr.html">Exploded view →</a>
+</div></nav>
+
+<!-- ===== BRAND HERO ===== -->
+<header class="hero"><div class="wrap">
+  <div class="big">S</div>
+  <div style="flex:1;min-width:240px">
+    <div class="eyebrow">Brand story</div>
+    <h1>Suzuki</h1>
+    <div class="tag">Fast, light and full of attitude</div>
+  </div>
+</div>
+<div class="wrap"><div class="facts"><div class="fact"><span>Founded</span><b>1909</b></div><div class="fact"><span>Country</span><b>Japan</b></div><div class="fact"><span>Headquarters</span><b>Hamamatsu, Japan</b></div><div class="fact"><span>Founder / origin</span><b>Michio Suzuki</b></div></div></div></header>
+
+<!-- ===== STORY + STRENGTHS ===== -->
+<section><div class="wrap"><div class="cols">
+  <div><div class="eyebrow">About</div><h2 class="title">The Suzuki story</h2>
+    <p><b>Suzuki makes fast, good-value bikes with plenty of character. The GSX-R sport bikes and the legendary Hayabusa are what the brand is famous for.</b></p><p>Suzuki began as a loom (weaving machine) maker. Motorised bicycles in 1952 led to full motorcycles and a strong racing record. The GSX-R750 of 1985 invented the modern race-replica, and the Hayabusa of 1999 shook the world with its top speed.</p></div>
+  <div><div class="eyebrow">Why riders like it</div><h2 class="title">Strengths</h2><ul class="tick"><li>Strong performance for the price</li><li>Light, agile sport bikes with racing roots</li><li>Iconic designs such as the Katana and the Hayabusa</li></ul></div>
+</div></div></section>
+
+<!-- ===== SIGNATURE BIKES ===== -->
+<section style="background:var(--bg2)"><div class="wrap">
+  <div class="eyebrow">Signature bikes</div><h2 class="title">Famous Suzuki big bikes</h2>
+  <p class="sub">Three well-known models. Figures are approximate.</p>
+  <div class="grid g3"><div class="card" style="--c:#2f6fe0"><small>Hyper-sport</small><h3>Hayabusa</h3><p>1,340 cc inline-four · ≈ 190 hp</p></div><div class="card" style="--c:#2f6fe0"><small>Superbike</small><h3>GSX-R1000R</h3><p>999 cc inline-four</p></div><div class="card" style="--c:#2f6fe0"><small>Adventure</small><h3>V-Strom 1050</h3><p>1,037 cc V-twin</p></div></div>
+</div></section>
+
+<!-- ===== HISTORY TIMELINE ===== -->
+<section><div class="wrap">
+  <div class="eyebrow">History</div><h2 class="title">Key moments</h2>
+  <p class="sub">From the start of Suzuki to today.</p>
+  <div class="tl" id="tl"><div class="ev"><div class="box"><span class="y">1909</span><h5>Suzuki Loom Works</h5><p>Michio Suzuki builds weaving looms in Hamamatsu.</p></div></div><div class="ev"><div class="box"><span class="y">1952</span><h5>Power Free</h5><p>Suzuki’s first motorised bicycle.</p></div></div><div class="ev"><div class="box"><span class="y">1976</span><h5>Barry Sheene</h5><p>The British rider wins the 500 cc world title on a Suzuki (again in 1977).</p></div></div><div class="ev"><div class="box"><span class="y">1981</span><h5>Katana</h5><p>A sharp, sword-like design that looked like nothing else.</p></div></div><div class="ev"><div class="box"><span class="y">1985</span><h5>GSX-R750</h5><p>Race-bred and lightweight: the first modern sport-bike formula.</p></div></div><div class="ev"><div class="box"><span class="y">1999</span><h5>Hayabusa</h5><p>About 312 km/h (194 mph): the fastest production bike of its day.</p></div></div></div>
+</div></section>
+
+<!-- ===== EXPLODED VIEW LINK ===== -->
+<section style="padding-top:0"><div class="wrap"><div class="banner">
+  <div><h3>Take a Hayabusa apart</h3><p>Open the exploded view, click the bike and see every part with care tips.</p></div>
+  <a class="btn primary" href="hayabusa.html">Open Hayabusa exploded view →</a>
+</div></div></section>
+
+<!-- ===== PREVIOUS / NEXT BRAND ===== -->
+<section style="padding:0 0 56px"><div class="wrap"><div class="pn">
+  <a href="yamaha.html">← <small>Previous brand</small>Yamaha</a>
+  <a href="bmw.html" style="text-align:right"><small>Next brand</small>BMW →</a>
+</div></div></section>
+<footer><div class="wrap">Example site for learning. Dates and figures are simplified and approximate; check each manufacturer for official details. Brand names belong to their owners; no logos are used here.</div></footer>
+<script>
+// Scroll reveal: timeline cards fade in when they enter the screen
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); } }), {threshold:.15});
+document.querySelectorAll('.ev').forEach(e => io.observe(e));
+</script>
+</body>
+</html>

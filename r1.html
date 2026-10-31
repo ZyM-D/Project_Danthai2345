@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YZF-R1 Exploded View</title>
+<style>
+  /* ===== THEME: colour variables used everywhere (change --accent to re-colour the whole page) ===== */
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#2a313c; --text:#e6edf3; --muted:#8b96a5; --accent:#3ddc6c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  /* ===== HEADER BAR: title + control buttons ===== */
+  header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line)}
+  header h1{font-size:18px;margin:0;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header small{color:var(--muted)}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  button{background:var(--panel);color:var(--text);border:1px solid var(--line);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);color:#04120a;border-color:var(--accent);font-weight:600}
+  .slider{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+  input[type=range]{accent-color:var(--accent);width:140px}
+  /* ===== LAYOUT: bike stage on the left, info panels on the right (stacks on phones) ===== */
+  main{display:grid;grid-template-columns:1fr 340px;gap:16px;padding:16px 24px}
+  @media(max-width:960px){main{grid-template-columns:1fr}}
+  /* ===== STAGE: the box that holds the SVG bike, the hint and the pop-up card ===== */
+  .stage{position:relative;background:radial-gradient(circle at 50% 40%,#1b222c,#0d1117 70%);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:420px}
+  svg{width:100%;height:auto;display:block}
+  /* Floating "click the bike" hint pill */
+  .hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(61,220,108,.12);border:1px solid var(--accent);color:var(--accent);padding:7px 16px;border-radius:999px;font-size:13px;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+  .badge-state{position:absolute;left:14px;top:12px;font-size:12px;color:var(--muted);background:rgba(0,0,0,.35);padding:4px 10px;border-radius:6px}
+  /* ===== PART STATES: hover glow, selected glow, and dimming of the other parts ===== */
+  .part{transition:filter .2s,opacity .25s}
+  .stage.ready .part{cursor:pointer}
+  .stage.exploded .part:hover,.part.sel{filter:drop-shadow(0 0 7px #3ddc6c) brightness(1.3)}
+  .stage.has-sel .part:not(.sel){opacity:.3}
+  /* ===== SQUARE POP-UP CARD that appears next to a clicked part ===== */
+  #pop{position:absolute;width:250px;height:250px;z-index:6;background:rgba(11,15,20,.96);border:2px solid var(--accent);border-radius:12px;padding:14px;overflow:auto;opacity:0;transform:scale(.85);pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 12px 34px rgba(0,0,0,.6),0 0 22px rgba(61,220,108,.25)}
+  #pop.show{opacity:1;transform:scale(1);pointer-events:auto}
+  #pop .no{display:inline-block;background:var(--accent);color:#04120a;font-weight:700;border-radius:6px;padding:1px 8px;font-size:11px}
+  #pop h4{margin:6px 0 4px;font-size:16px}
+  #pop p{margin:0 0 6px;font-size:12px;color:#c4ccd6;line-height:1.45}
+  #pop table{font-size:12px;margin-top:4px}
+  #pop .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--muted);font-size:18px;padding:2px 6px;cursor:pointer}
+  /* Overlay SVG that draws the dashed line from the part to the pop-up card */
+  #conn{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+  /* ===== HOVER TOOLTIP that follows the mouse (name + one-line summary) ===== */
+  #tip{position:fixed;pointer-events:none;background:#0b0f14;border:1px solid var(--accent);border-radius:8px;padding:8px 12px;font-size:12px;max-width:220px;opacity:0;transition:opacity .15s;z-index:10;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+  #tip b{display:block;font-size:13px;color:var(--accent);margin-bottom:2px}
+  #tip i{color:var(--muted);font-style:normal;display:block;margin-top:4px;font-size:11px}
+  /* ===== RIGHT-HAND PANELS: part details, assembly list, care checklist, log ===== */
+  aside{display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h2{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  #detail h3{margin:0 0 4px;font-size:20px}
+  #detail .no{display:inline-block;background:var(--accent);color:#04120a;font-weight:700;border-radius:6px;padding:1px 8px;font-size:12px;margin-bottom:6px}
+  #detail p{margin:6px 0;color:#c4ccd6;font-size:14px;line-height:1.5}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  td{padding:5px 0;border-bottom:1px solid var(--line)}
+  td:first-child{color:var(--muted);width:42%}
+  .placeholder{color:var(--muted);font-size:14px;line-height:1.5}
+  /* Assembly-order list (numbered circles turn green as parts are installed) */
+  ol#steps{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+  ol#steps li{display:flex;gap:10px;align-items:center;padding:6px 8px;border-radius:7px;font-size:13px;cursor:pointer;border:1px solid transparent}
+  ol#steps li:hover,ol#steps li.sel{border-color:var(--accent);background:rgba(61,220,108,.08)}
+  ol#steps li span{width:22px;height:22px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:11px;flex:none}
+  ol#steps li.done span{background:var(--accent);color:#04120a}
+  /* Process log (monospace, auto-scrolls) */
+  #log{font:12px/1.6 ui-monospace,Menlo,monospace;color:#9fe3b3;max-height:130px;overflow:auto;margin:0;padding:0;list-style:none}
+  #log li{opacity:.9}
+  #log li::before{content:"› ";color:var(--muted)}
+  /* ===== CARE / MAINTENANCE BOX shown inside the detail panel ===== */
+  .careBox{margin-top:12px;background:rgba(61,220,108,.07);border:1px solid rgba(61,220,108,.35);border-radius:10px;padding:10px 12px}
+  .careBox h5{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent)}
+  .careBox .every{font-size:13px;font-weight:600;margin-bottom:6px}
+  .careBox ul{margin:0 0 8px;padding-left:18px;font-size:13px;line-height:1.5;color:#c4ccd6}
+  .careBox .warn{font-size:12px;color:#ffcf6b;background:rgba(255,176,46,.1);border-radius:6px;padding:6px 8px}
+  #pop .care{margin-top:8px;font-size:11px;color:var(--accent)}
+  .chk{margin:0;padding:0;list-style:none;font-size:13px;line-height:1.7;color:#c4ccd6}
+  .chk b{color:var(--accent);display:inline-block;min-width:74px}
+  /* ===== MODEL SWITCHER + MODEL CARD ===== */
+  nav.bikes{display:flex;flex-wrap:wrap;gap:6px;padding:10px 24px;border-bottom:1px solid var(--line);background:#0b0f14}
+  nav.bikes a{padding:6px 12px;border-radius:999px;font-size:13px;color:var(--muted);border:1px solid var(--line);text-decoration:none}
+  nav.bikes a:hover{color:var(--text)}
+  nav.bikes a.on{background:var(--accent);border-color:var(--accent);color:#04120a;font-weight:700}
+  #model .name{font-size:22px;font-weight:800}
+  #model .tag{color:var(--muted);font-size:13px;margin:2px 0 6px}
+  footer{padding:0 24px 24px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<!-- ===== HEADER: title and controls (Explode/Assemble, play sequence, reset, slider) ===== -->
+<header>
+  <div>
+    <h1>EXPLODED <span>VIEW</span> <small>· Yamaha YZF-R1</small></h1>
+    <!-- link back to the home / brands / history page (keep both files in the same folder) -->
+    <a href="home.html" style="color:var(--accent);font-size:13px;text-decoration:none">← Home</a>
+  </div>
+  <div class="controls">
+    <button class="primary" id="btnToggle">Explode</button>
+    <button id="btnAssemble">▶ Play assembly sequence</button>
+    <button id="btnReset">Reset</button>
+    <label class="slider">Explode <input type="range" id="range" min="0" max="100" value="0"></label>
+  </div>
+</header>
+<!-- ===== BIKE SWITCHER: jump between model pages ===== -->
+<nav class="bikes"><a href="home.html">Home</a><a href="cbr250rr.html">CBR250RR</a><a href="hayabusa.html">Hayabusa</a><a href="r1.html" class="on">R1</a><a href="s1000rr.html">S1000RR</a><a href="exploded-bike.html">ZX-4RR demo</a></nav>
+
+
+<!-- ===== MAIN: stage (left) + side panels (right) ===== -->
+<main>
+  <!-- STAGE: everything the bike is drawn in -->
+  <section class="stage ready" id="stage">
+    <div class="badge-state" id="state">State: assembled</div>
+    <!-- Main SVG canvas (1100x700 units). All bike parts are drawn into <g id="parts"> by the script below -->
+    <svg id="svg" viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg" aria-label="Exploded view of a sport bike">
+      <!-- Reusable gradients/patterns. Parts reference them with fill="url(#name)" -->
+      <defs>
+        <linearGradient id="gPaint" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7683"/><stop offset=".3" stop-color="#2a3139"/><stop offset=".7" stop-color="#12161a"/><stop offset="1" stop-color="#232a31"/></linearGradient>
+        <radialGradient id="gLens" cx=".35" cy=".35" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#cfe3f7"/><stop offset="1" stop-color="#6f8aa6"/></radialGradient>
+        <linearGradient id="gSpoke" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a6bd0"/><stop offset="1" stop-color="#0b1a52"/></linearGradient>
+        <radialGradient id="gTyre" cx="0" cy="0" r="85" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0a0b0c"/><stop offset=".74" stop-color="#0a0b0c"/><stop offset=".88" stop-color="#181b1f"/><stop offset="1" stop-color="#2d3238"/></radialGradient>
+        <radialGradient id="gShadow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".85"/><stop offset=".6" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+        <linearGradient id="gFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <filter id="soft" x="-10%" y="-10%" width="120%" height="125%"><feDropShadow dx="0" dy="4" stdDeviation="3.5" flood-color="#000" flood-opacity=".55"/></filter>
+        <linearGradient id="gMain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6f95ff"/><stop offset=".5" stop-color="#1f4fd8"/><stop offset="1" stop-color="#0b2380"/></linearGradient><linearGradient id="gSec" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#e6ebf2"/><stop offset="1" stop-color="#9aa6b6"/></linearGradient><linearGradient id="gFork" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe08c"/><stop offset=".5" stop-color="#bb8414"/><stop offset="1" stop-color="#f6c957"/></linearGradient><linearGradient id="gCal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c6cbd2"/><stop offset="1" stop-color="#8a9099"/></linearGradient><linearGradient id="gBlack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a525b"/><stop offset=".25" stop-color="#14181c"/><stop offset=".7" stop-color="#050607"/><stop offset="1" stop-color="#1b2026"/></linearGradient><linearGradient id="gDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7b838d"/><stop offset=".4" stop-color="#2b3036"/><stop offset="1" stop-color="#101316"/></linearGradient><linearGradient id="gTitan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9c79b"/><stop offset=".45" stop-color="#7d8aa0"/><stop offset="1" stop-color="#b79a5c"/></linearGradient><linearGradient id="gSpoke2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a6bd0"/><stop offset="1" stop-color="#0b1a52"/></linearGradient>
+        <linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6eaef"/><stop offset=".5" stop-color="#868c95"/><stop offset="1" stop-color="#c6cbd2"/></linearGradient>
+        <linearGradient id="gRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b4bac3"/><stop offset="1" stop-color="#4a5058"/></linearGradient>
+        <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe08c"/><stop offset=".5" stop-color="#bb8414"/><stop offset="1" stop-color="#f6c957"/></linearGradient>
+        <linearGradient id="gGreen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#72f7a1"/><stop offset="1" stop-color="#1b9748"/></linearGradient>
+        <linearGradient id="gBodyDark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#505a64"/><stop offset=".5" stop-color="#1e242a"/><stop offset="1" stop-color="#0e1114"/></linearGradient>
+        <linearGradient id="gTank" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a747f"/><stop offset=".45" stop-color="#262c33"/><stop offset="1" stop-color="#101316"/></linearGradient>
+        <linearGradient id="gGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8e6ff" stop-opacity=".65"/><stop offset="1" stop-color="#466ea0" stop-opacity=".25"/></linearGradient>
+        <linearGradient id="gLight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fb0c4"/></linearGradient>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".04"/>
+        </pattern>
+        <linearGradient id="gEngine" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#b6bac1"/><stop offset="1" stop-color="#6c7078"/>
+        </linearGradient>
+        <linearGradient id="gBody" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#343b42"/><stop offset="1" stop-color="#14181c"/>
+        </linearGradient>
+      </defs>
+      <rect width="1100" height="700" fill="url(#grid)"/>
+      <rect x="0" y="512" width="1100" height="188" fill="url(#gFloor)"/>
+      <ellipse id="shadow" cx="560" cy="514" rx="470" ry="22" fill="url(#gShadow)"/>
+      <!-- Dashed guide lines (one per part) drawn BEHIND the parts, showing where each part came from -->
+      <g id="guides"></g>
+      <!-- Every bike part <g class="part"> is inserted here by JavaScript -->
+      <g id="parts" filter="url(#soft)"></g>
+    </svg>
+    <!-- Overlay for the line that links a selected part to its pop-up card -->
+    <svg id="conn"><line id="connLine" stroke="#3ddc6c" stroke-width="2" stroke-dasharray="4 4" opacity="0"/><circle id="connDot" r="5" fill="#3ddc6c" opacity="0"/></svg>
+    <!-- The square detail card (filled and positioned by showPop/placePop) -->
+    <div id="pop"></div>
+    <div class="hint" id="hint">👆 Click the bike to explode it</div>
+  </section>
+
+  <!-- RIGHT PANELS -->
+  <aside>
+    <!-- Model card: filled from BIKE.quick -->
+    <div class="card" id="model"></div>
+    <div class="card" id="detail">
+      <h2>Part details</h2>
+      <div class="placeholder" id="placeholder">Step 1 — click the assembled bike to explode it.<br>Step 2 — hover any part for a quick preview.<br>Step 3 — click a part to see its details and how to take care of it.</div>
+      <div id="detailBody" hidden></div>
+    </div>
+    <div class="card">
+      <h2>Assembly order</h2>
+      <ol id="steps"></ol>
+    </div>
+    <div class="card">
+      <h2>Owner care checklist</h2>
+      <ul class="chk">
+        <li><b>Every ride</b> tyres, brakes, lights, chain, fluids</li>
+        <li><b>Weekly</b> oil level, chain lube, wash</li>
+        <li><b>Monthly</b> coolant, pads, bolts, battery</li>
+        <li><b>6 months</b> exhaust, fuel system, cables</li>
+        <li><b>Yearly</b> full service, brake fluid check</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Process log</h2>
+      <ul id="log"></ul>
+    </div>
+  </aside>
+</main>
+<footer>Example only: the drawing is an original illustration, not an official manufacturer drawing, and figures are approximate. Check the owner's manual for exact specs and service intervals. No logos are used.</footer>
+<!-- Hover tooltip element -->
+<div id="tip"></div>
+
+<script>
+// ===== BIKE CONFIG (generated): colours, names and specs for this model =====
+const BIKE = {
+ "name": "YZF-R1",
+ "brand": "Yamaha",
+ "tag": "Track-bred superbike with a crossplane inline-four.",
+ "quick": [
+  [
+   "Engine",
+   "998 cc crossplane inline-four"
+  ],
+  [
+   "Power",
+   "≈ 197–200 hp (claimed)"
+  ],
+  [
+   "Weight",
+   "≈ 199 kg wet"
+  ],
+  [
+   "Fuel tank",
+   "≈ 17 L"
+  ],
+  [
+   "Frame",
+   "Aluminium Deltabox"
+  ],
+  [
+   "Brakes",
+   "Dual ≈ 320 mm discs"
+  ]
+ ],
+ "theme": {
+  "main": [
+   "#6f95ff",
+   "#1f4fd8",
+   "#0b2380"
+  ],
+  "sec": [
+   "#ffffff",
+   "#e6ebf2",
+   "#9aa6b6"
+  ],
+  "mainEdge": "#0b2380",
+  "s1": "#0b2380",
+  "s2": "#e0262c",
+  "line3": "#cfd6df",
+  "badge": "#0b2380",
+  "badgeText": "R1",
+  "tankLine": "#ffffff",
+  "tankText": "#ffffff",
+  "tankLabel": "R1",
+  "frame": "#3b4a63",
+  "frameHi": "#9db3d6",
+  "sub": "#2a2f35",
+  "fork": [
+   "#ffe08c",
+   "#bb8414",
+   "#f6c957"
+  ],
+  "forkDark": "#7a5a12",
+  "cal": [
+   "#ffffff",
+   "#c6cbd2",
+   "#8a9099"
+  ],
+  "calDark": "#555c66",
+  "spring": "#ffffff",
+  "rim": "#1f4fd8",
+  "rimEdge": "#9db3d6",
+  "spoke": [
+   "#4a6bd0",
+   "#0b1a52"
+  ],
+  "swing": "gMetal",
+  "tip": "#aeb4bd",
+  "coils": [
+   470,
+   497,
+   524
+  ],
+  "hdr": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "sx": 660,
+  "sy": 466,
+  "sw": 88,
+  "sh": 32,
+  "sfill": "gDark"
+ },
+ "ovr": {
+  "engine": {
+   "short": "998 cc crossplane inline-four.",
+   "desc": "A crossplane crankshaft makes the cylinders fire at uneven intervals. This gives the engine a V4-like rhythm and strong, easy-to-use traction when you open the throttle out of a corner.",
+   "specs": [
+    [
+     "Layout",
+     "Inline-4, crossplane crank"
+    ],
+    [
+     "Displacement",
+     "≈ 998 cc"
+    ],
+    [
+     "Cooling",
+     "Liquid"
+    ],
+    [
+     "Power (approx.)",
+     "≈ 197–200 hp @ 13,500 rpm"
+    ]
+   ]
+  },
+  "frame": {
+   "name": "Deltabox Frame",
+   "short": "Aluminium Deltabox chassis.",
+   "desc": "Cast and extruded aluminium beams form a very stiff, light frame. It gives precise feedback for racing and fast road riding.",
+   "specs": [
+    [
+     "Type",
+     "Aluminium Deltabox"
+    ],
+    [
+     "Rake",
+     "≈ 24°"
+    ],
+    [
+     "Wheelbase",
+     "≈ 1,405 mm"
+    ],
+    [
+     "Mass",
+     "≈ 10 kg"
+    ]
+   ]
+  },
+  "fork": {
+   "short": "Upside-down fork, gold finish.",
+   "specs": [
+    [
+     "Type",
+     "Upside-down telescopic"
+    ],
+    [
+     "Tube",
+     "≈ 43 mm"
+    ],
+    [
+     "Travel",
+     "≈ 120 mm"
+    ],
+    [
+     "Adjust",
+     "Preload, compression, rebound"
+    ]
+   ]
+  },
+  "frontwheel": {
+   "short": "17-inch wheel, twin discs.",
+   "specs": [
+    [
+     "Size",
+     "17 in"
+    ],
+    [
+     "Tyre",
+     "120/70 ZR17"
+    ],
+    [
+     "Brakes",
+     "Dual ≈ 320 mm discs"
+    ],
+    [
+     "ABS",
+     "Yes (IMU-linked)"
+    ]
+   ]
+  },
+  "rearwheel": {
+   "specs": [
+    [
+     "Size",
+     "17 in"
+    ],
+    [
+     "Tyre",
+     "190/55 ZR17"
+    ],
+    [
+     "Brakes",
+     "≈ 220 mm disc"
+    ],
+    [
+     "Drive",
+     "Chain"
+    ]
+   ]
+  },
+  "tank": {
+   "short": "≈ 17 L tank.",
+   "specs": [
+    [
+     "Capacity",
+     "≈ 17 L"
+    ],
+    [
+     "Material",
+     "Aluminium"
+    ],
+    [
+     "Pump",
+     "In-tank, EFI"
+    ],
+    [
+     "Filler",
+     "Quick-release cap"
+    ]
+   ]
+  },
+  "fairing": {
+   "short": "Sharp blue and white racing fairing.",
+   "specs": [
+    [
+     "Material",
+     "ABS plastic"
+    ],
+    [
+     "Finish",
+     "Gloss blue + white, clear coat"
+    ],
+    [
+     "Windscreen",
+     "Low, polycarbonate"
+    ],
+    [
+     "Headlight",
+     "Twin LED eyes"
+    ]
+   ]
+  },
+  "exhaust": {
+   "short": "4-into-1 with short silencer.",
+   "specs": [
+    [
+     "Layout",
+     "4-1 header + silencer"
+    ],
+    [
+     "Material",
+     "Stainless steel + titanium"
+    ],
+    [
+     "Catalyst",
+     "Yes"
+    ],
+    [
+     "Sound",
+     "≈ 88 dB"
+    ]
+   ]
+  },
+  "seat": {
+   "short": "Sharp, upswept tail."
+  }
+ },
+ "extraCare": "On a race-bred engine, let it warm up properly before hard riding and follow the oil-change interval strictly."
+};
+const T = BIKE.theme;   // short alias used inside the part drawings
+
+// ---------- helpers for drawing ----------
+// bolts(cx, cy, r, n, br, fill)
+// Draws n small circles (bolt heads) evenly around a centre point.
+//   cx,cy = centre   r = ring radius   n = count   br = bolt radius   fill = colour (optional)
+// Returns an SVG string, so it can be dropped inside any part's drawing.
+function bolts(cx, cy, r, n, br, fill) {
+  fill = fill || '#2a2d31';
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const a = i * 2 * Math.PI / n;
+    s += `<circle cx="${(cx + r * Math.cos(a)).toFixed(1)}" cy="${(cy + r * Math.sin(a)).toFixed(1)}" r="${br}" fill="${fill}"/>`;
+  }
+  return s;
+}
+// wheel(cx, cy, rear)
+// Returns the SVG for a complete wheel: tyre, tread, rim, 5 twin-spokes, brake disc, hub and bolts.
+//   cx,cy = wheel centre in SVG units   rear = true draws the smaller rear disc + sprocket,
+//   false draws the large front brake disc. The group is scaled 1.08x so wheels look bigger.
+function wheel(cx, cy, rear) {
+  let spokes = '';
+  const f = n => n.toFixed(1);
+  for (let i = 0; i < 5; i++) {
+    const a = (i * 72 - 90) * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a), px = -sa, py = ca;
+    [-1, 1].forEach(sd => {
+      const x1 = 15 * ca + px * sd * 5, y1 = 15 * sa + py * sd * 5;
+      const x2 = 61 * ca + px * sd * 12, y2 = 61 * sa + py * sd * 12;
+      const x3 = 61 * ca + px * sd * 5, y3 = 61 * sa + py * sd * 5;
+      const x4 = 15 * ca + px * sd * 1.5, y4 = 15 * sa + py * sd * 1.5;
+      spokes += `<path d="M${f(x1)} ${f(y1)} L${f(x2)} ${f(y2)} L${f(x3)} ${f(y3)} L${f(x4)} ${f(y4)} Z" fill="url(#gSpoke)" stroke="#78828e" stroke-width=".9"/>`;
+    });
+  }
+  const disc = rear
+    ? `<circle r="30" fill="none" stroke="#aab1ba" stroke-width="7"/><circle r="30" fill="none" stroke="#15181b" stroke-width="3" stroke-dasharray="2 5"/>
+       <circle r="41" fill="none" stroke="#8a9099" stroke-width="6" stroke-dasharray="4 3"/><circle r="36" fill="none" stroke="#4d545c" stroke-width="2"/>`
+    : `<circle r="47" fill="none" stroke="#b9bfc8" stroke-width="9"/><circle r="47" fill="none" stroke="#15181b" stroke-width="4" stroke-dasharray="2 5"/>
+       <circle r="39" fill="none" stroke="#6b717a" stroke-width="2"/>`;
+  return `<g transform="translate(${cx},${cy}) scale(1.08)">
+    <circle r="85" fill="url(#gTyre)"/><circle r="77" fill="none" stroke="#2b3036" stroke-width="1.2"/><circle r="75" fill="none" stroke="#000" stroke-width="1"/>
+    <circle r="81" fill="none" stroke="#202328" stroke-width="7" stroke-dasharray="5 4"/>
+    <circle r="72" fill="none" stroke="#17191c" stroke-width="2"/>
+    <path d="M-62 -58 A85 85 0 0 1 24 -82" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="3" stroke-linecap="round"/>
+    <circle r="64" fill="#101215" stroke="${T.rim}" stroke-width="6"/><circle r="67.5" fill="none" stroke="${T.rimEdge}" stroke-width="1"/>
+    <circle r="58" fill="none" stroke="#07080a" stroke-width="2"/>
+    ${disc}${spokes}
+    <circle r="14" fill="url(#gMetal)" stroke="#4d545c"/>${bolts(0, 0, 8, 5, 1.6)}<circle r="4.5" fill="#1d2025"/>
+  </g>`;
+}
+
+// ---------- part data (ex = explode offset in SVG units, step = assembly order) ----------
+// Array order = draw order (back to front).
+// ===================================================================================
+// PART DATA
+// Each part is one object with these fields:
+//   id     unique name (used in the DOM and CARE data)
+//   name   title shown to the user
+//   step   assembly order number (1 = installed first)
+//   ex     [dx, dy] how far the part flies away when exploded (SVG units)
+//   short  one-line text for the hover tooltip / pop-up card
+//   svg    the drawing of the part (SVG markup, in assembled position)
+//   desc   long description for the side panel
+//   specs  [label, value] rows for the spec table
+//   func   what the part does (shown first in the table)
+// ARRAY ORDER = DRAW ORDER: later parts are painted on top of earlier ones
+// (that is why the fairing comes after the fork: it sits on top of the fork).
+// ===================================================================================
+const parts = [
+  // 9 · REAR WHEEL – uses wheel() with rear=true; first in the list so it is painted furthest back
+  { id:'rearwheel', name:'Rear Wheel', step:9, ex:[190,80],
+    short:'Cast alloy wheel with 160 mm tyre.',
+    svg:wheel(745,420,true),
+    desc:'Transfers drive torque to the road. The rear wheel carries most of the rider’s weight under acceleration, so it is balanced and trued before fitting.',
+    specs:[['Size','17 × 4.0 in'],['Tyre','160/60 R17'],['Material','Cast aluminium alloy'],['Mass','≈ 9.4 kg']],
+    func:'Drive & traction' },
+
+  // 3 · SWINGARM – pivots at the frame and carries the rear wheel (includes chain line and axle plate)
+  { id:'swingarm', name:'Swingarm', step:3, ex:[110,70],
+    short:'Pivoting arm that holds the rear wheel.',
+    svg:`<path d="M626 374 L762 404 L762 440 L632 418 Z" fill="url(#${T.swing})" stroke="#6a7480" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M640 380 L752 408" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+  <path d="M650 400 L742 424 L742 432 L654 410 Z" fill="#0c0e11" opacity=".8"/>
+  <path d="M642 372 L760 396" stroke="#9aa0a9" stroke-width="2" stroke-dasharray="3 3"/>
+  <circle cx="640" cy="394" r="14" fill="url(#gMetal)" stroke="#4d545c" stroke-width="2"/><circle cx="640" cy="394" r="5.5" fill="#1d2025"/>
+  <path d="M631 411 L745 376" stroke="#0d0f11" stroke-width="5"/><path d="M631 411 L745 376" stroke="#9aa0a9" stroke-width="2" stroke-dasharray="2.5 2.5"/>
+  <path d="M631 437 L745 464" stroke="#0d0f11" stroke-width="5"/><path d="M631 437 L745 464" stroke="#9aa0a9" stroke-width="2" stroke-dasharray="2.5 2.5"/>
+  <rect x="744" y="410" width="28" height="22" rx="5" fill="url(#gMetal)" stroke="#555c66"/>
+  <path d="M740 400 L756 404 L752 414 L738 410 Z" fill="#e8ebef" stroke="#8a9099"/>`,
+    desc:'Connects the rear wheel to the frame and pivots with the rear shock to keep the tyre planted over bumps.',
+    specs:[['Type','Box-section, double sided'],['Material','Aluminium'],['Pivot','Needle-bearing'],['Length','≈ 570 mm']],
+    func:'Rear suspension geometry' },
+
+  // 4 · REAR SHOCK – coil spring, reservoir and linkage; the old drawing is squashed to fit using a transform
+  { id:'rearshock', name:'Rear Shock', step:4, ex:[100,-70],
+    short:'Spring and damper, adjustable preload.',
+    svg:`<g transform="translate(690,316) scale(1,.66) translate(-706,-283)">`+`<circle cx="706" cy="283" r="7" fill="url(#gMetal)" stroke="#555c66"/>
+      <rect x="699" y="289" width="14" height="28" rx="5" fill="url(#gGold)" stroke="#8a6410"/>
+      <rect x="720" y="296" width="14" height="30" rx="6" fill="url(#gMain)" stroke="#146b31"/><path d="M713 302 L720 304" stroke="#111" stroke-width="3"/>
+      <path d="M706 317 l16 7 -32 8 32 8 -32 8 32 8 -32 8 32 8 -16 6" fill="none" stroke="${T.spring}" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M704 317 l16 7 -32 8 32 8 -32 8 32 8 -32 8 32 8 -16 6" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linejoin="round"/>
+      <rect x="699" y="378" width="14" height="28" rx="5" fill="url(#gMetal)" stroke="#555c66"/>
+      <circle cx="706" cy="410" r="7" fill="url(#gMetal)" stroke="#555c66"/>
+      <path d="M706 410 L690 426 L670 420" fill="none" stroke="#7b828c" stroke-width="5" stroke-linecap="round"/><circle cx="670" cy="420" r="4" fill="#2a2d31"/>`+`</g>`,
+    desc:'Absorbs impacts from the road. The spring supports the load while the damper controls how fast it compresses and rebounds.',
+    specs:[['Spring','Coil, preload adjustable'],['Damping','Rebound adjustable'],['Travel','≈ 130 mm'],['Link','Progressive linkage']],
+    func:'Shock absorption' },
+
+  // 1 · TRELLIS FRAME – green tubes, steering head, pivot plate and footpeg; everything bolts onto this
+  { id:'frame', name:'Trellis Frame', step:1, ex:[0,-20],
+    short:'Steel trellis backbone of the bike.',
+    svg:`<g stroke-linejoin="round" stroke-linecap="round" fill="none">
+    <g stroke="${T.sub}" stroke-width="9"><path d="M640 304 L700 284 L836 252"/><path d="M700 294 L790 276 L832 258"/><path d="M392 284 L468 374 L560 406"/></g>
+    <g stroke="rgba(255,255,255,.28)" stroke-width="2"><path d="M642 298 L700 279 L834 247"/></g>
+  </g>
+  <path d="M392 252 L520 262 L644 306 L656 404 L620 410 L614 344 L522 304 L410 282 Z" fill="url(#gMetal)" stroke="${T.frame}" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M404 262 L520 270 L638 308" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M412 284 L522 306 L614 346" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="2"/>
+  <rect x="378" y="232" width="30" height="58" rx="8" fill="#16191d" stroke="${T.frameHi}" stroke-width="2" transform="rotate(26 393 261)"/>
+  <path d="M618 340 L670 340 L674 414 L626 414 Z" fill="#20262c" stroke="${T.frameHi}" stroke-width="2"/>${bolts(646,362,10,4,2,'#8a9099')}
+  <rect x="628" y="438" width="38" height="8" rx="3" fill="#555c66"/><path d="M646 414 L646 440" stroke="${T.frame}" stroke-width="5"/>`,
+    desc:'The structural core. Triangulated steel tubes give high stiffness at low weight and everything else bolts onto it.',
+    specs:[['Type','Tubular steel trellis'],['Rake','24.5°'],['Trail','≈ 95 mm'],['Mass','≈ 11 kg']],
+    func:'Structure & chassis' },
+
+  // 2 · ENGINE – cylinder block with fins, cam cover, clutch and alternator covers; moved into place with translate()
+  { id:'engine', name:'Inline-Four Engine', step:2, ex:[-10,150],
+    short:'399 cc liquid-cooled four-cylinder.',
+    svg:`<g transform="translate(35,50)">`+`<path d="M446 394 L566 394 L556 417 L458 417 Z" fill="#3b4047" stroke="#23272c" stroke-width="2"/>
+      <rect x="432" y="326" width="148" height="72" rx="12" fill="url(#gEngine)" stroke="#4d5259" stroke-width="2"/>
+      <g transform="rotate(-10 500 340)">
+        <rect x="448" y="296" width="110" height="38" fill="url(#gEngine)" stroke="#4d5259" stroke-width="2"/>
+        ${[302,308,314,320,326].map(y=>`<line x1="448" y1="${y}" x2="558" y2="${y}" stroke="#5a5f66" stroke-width="1.5"/>`).join('')}
+        <rect x="452" y="278" width="104" height="22" rx="3" fill="#59606a" stroke="#3b4047" stroke-width="2"/>
+        <rect x="456" y="262" width="96" height="18" rx="4" fill="#1d2126" stroke="#444b53" stroke-width="2"/>
+        ${[468,486,504,522,540].map(x=>`<circle cx="${x}" cy="271" r="2.6" fill="#a0a6af"/>`).join('')}
+        ${T.coils.map(x=>`<rect x="${x}" y="246" width="12" height="16" rx="3" fill="#2a2f35" stroke="#555c66"/>`).join('')}
+      </g>
+      <circle cx="550" cy="366" r="28" fill="url(#gMetal)" stroke="#4d5259" stroke-width="2"/><circle cx="550" cy="366" r="19" fill="#4a5058"/>${bolts(550,366,23.5,8,2.2)}<circle cx="550" cy="366" r="8" fill="#2a2d31"/>
+      <circle cx="466" cy="372" r="18" fill="url(#gMetal)" stroke="#4d5259" stroke-width="2"/><circle cx="466" cy="372" r="8" fill="#3b4047"/>
+      <path d="M578 350 L606 358 L604 394 L578 394 Z" fill="#353a40" stroke="#555c66" stroke-width="2"/>
+      <circle cx="596" cy="374" r="13" fill="none" stroke="#9aa0a9" stroke-width="5" stroke-dasharray="3 2.5"/><circle cx="596" cy="374" r="4" fill="#20242a"/>
+      <path d="M440 336 Q438 362 448 388" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/>`+`</g>`,
+    desc:'Four cylinders in a row produce smooth power with a high-revving character. The crankcase doubles as a stressed member of the chassis.',
+    specs:[['Layout','Inline-4, DOHC 16V'],['Displacement','399 cc'],['Cooling','Liquid'],['Power (example)','≈ 75 hp @ 14,500 rpm']],
+    func:'Power generation' },
+
+  // 5 · EXHAUST – four header pipes (made with .map) joining a collector, mid pipe and silencer
+  { id:'exhaust', name:'Exhaust System', step:5, ex:[40,170],
+    short:'4-into-1 headers with silencer.',
+    svg:`${T.hdr.map(i=>`<path d="M${486+i*5} ${358+i*9} Q${470+i*4} 430 ${540} ${468+i*2} L590 486" fill="none" stroke="#2b3036" stroke-width="8" stroke-linecap="round"/><path d="M${486+i*5} ${358+i*9} Q${470+i*4} 430 ${540} ${468+i*2} L590 486" fill="none" stroke="url(#gMetal)" stroke-width="5.5" stroke-linecap="round"/>`).join('')}
+  <ellipse cx="600" cy="486" rx="22" ry="12" fill="url(#gMetal)" stroke="#5b616a" stroke-width="2"/>
+  <line x1="614" y1="486" x2="${T.sx+16}" y2="${T.sy+T.sh/2}" stroke="#9097a0" stroke-width="14" stroke-linecap="round"/>
+  <rect x="${T.sx}" y="${T.sy}" width="${T.sw}" height="${T.sh}" rx="${T.sh/2}" fill="url(#${T.sfill})" stroke="#6b7079" stroke-width="2"/>
+  <line x1="${T.sx+T.sw*.4}" y1="${T.sy+1}" x2="${T.sx+T.sw*.4}" y2="${T.sy+T.sh-1}" stroke="#555c66" stroke-width="2.5"/>
+  <rect x="${T.sx+10}" y="${T.sy-4}" width="${T.sw*.65}" height="12" rx="6" fill="#2a2f35" stroke="#4d545c"/>
+  <ellipse cx="${T.sx+T.sw-1}" cy="${T.sy+T.sh/2}" rx="${T.sh/7}" ry="${T.sh/2-3}" fill="#1c1f23" stroke="${T.tip}" stroke-width="2"/>
+  <path d="M${T.sx+T.sw*.5} ${T.sy+T.sh} L${T.sx+T.sw*.5-6} 516" stroke="#555c66" stroke-width="4" stroke-linecap="round"/>`,
+    desc:'Collects exhaust gas from each cylinder, merges it, and quietens it through the silencer while meeting emission limits.',
+    specs:[['Layout','4-1 header + silencer'],['Material','Stainless steel'],['Catalyst','3-way, in collector'],['Sound','≈ 92 dB']],
+    func:'Gas flow & noise control' },
+
+  // 6 · RADIATOR – finned core, fan and hoses (sits behind the fairing when assembled)
+  { id:'radiator', name:'Radiator', step:6, ex:[-95,95],
+    short:'Aluminium coolant radiator.',
+    svg:`<g transform="translate(95,25)">`+`<path d="M390 336 Q418 320 438 340" fill="none" stroke="#101215" stroke-width="8" stroke-linecap="round"/>
+      <path d="M390 382 Q414 398 442 388" fill="none" stroke="#101215" stroke-width="8" stroke-linecap="round"/>
+      <rect x="350" y="316" width="42" height="86" rx="8" fill="#242a30" stroke="#6b7079" stroke-width="2"/>
+      <rect x="356" y="324" width="30" height="70" rx="3" fill="url(#gMetal)" opacity=".8"/>
+      ${Array.from({length:12},(_,i)=>`<line x1="356" y1="${327+i*5.6}" x2="386" y2="${327+i*5.6}" stroke="#2b3036" stroke-width="1.5"/>`).join('')}
+      <circle cx="371" cy="359" r="13" fill="#14171a" stroke="#555c66" stroke-width="2"/><path d="M371 346 L371 372 M358 359 L384 359 M362 350 L380 368 M380 350 L362 368" stroke="#6b717a" stroke-width="2"/><circle cx="371" cy="359" r="3" fill="#8a9099"/>`+`</g>`,
+    desc:'Carries engine heat away. Coolant flows through thin aluminium fins while air passes over them.',
+    specs:[['Type','Single-core, aluminium'],['Coolant','50/50 glycol mix'],['Capacity','≈ 1.7 L system'],['Fan','Electric thermostatic']],
+    func:'Engine cooling' },
+
+  // 8 · FRONT WHEEL – uses wheel() with rear=false (large brake disc)
+  { id:'frontwheel', name:'Front Wheel', step:8, ex:[-135,85],
+    short:'17-inch wheel with twin brake discs.',
+    svg:wheel(300,420,false),
+    desc:'Steers the bike and takes the biggest share of braking force through twin discs and radial calipers.',
+    specs:[['Size','17 × 3.5 in'],['Tyre','120/70 R17'],['Brakes','Dual 290 mm discs'],['ABS','Yes']],
+    func:'Steering & braking' },
+
+  // 7 · FRONT FORK – gold upside-down tubes, triple clamp, front fender and brake caliper (drawn BEFORE the fairing, so the fairing sits on top of it)
+  { id:'fork', name:'Front Fork', step:7, ex:[-75,-5],
+    short:'Upside-down telescopic fork.',
+    svg:`<path d="M208 384 Q222 328 300 312 Q354 308 384 340 L374 354 Q346 332 300 330 Q246 338 230 392 Z" fill="url(#gBodyDark)" stroke="#6a7480" stroke-width="1.8" stroke-linejoin="miter"/>
+  <path d="M222 372 Q240 338 300 322" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+  <path d="M232 380 Q250 346 300 336" fill="none" stroke="${T.s1}" stroke-width="2.5"/>
+  <line x1="398" y1="238" x2="336" y2="354" stroke="${T.forkDark}" stroke-width="16" stroke-linecap="round"/>
+  <line x1="392" y1="236" x2="331" y2="352" stroke="url(#gFork)" stroke-width="15" stroke-linecap="round"/>
+  <line x1="387" y1="238" x2="327" y2="350" stroke="rgba(255,255,255,.45)" stroke-width="2"/>
+  <line x1="331" y1="352" x2="300" y2="420" stroke="url(#gMetal)" stroke-width="11" stroke-linecap="round"/>
+  <path d="M376 222 L412 232 L408 248 L372 240 Z" fill="#14171a" stroke="#7a8592" stroke-width="1.8"/>
+  <path d="M324 376 L352 366 L360 394 L334 404 Z" fill="url(#gCal)" stroke="${T.calDark}" stroke-width="2"/>${bolts(341,386,6,2,1.8,'#2a2d31')}
+  <path d="M360 252 Q392 320 350 368" fill="none" stroke="#0b0d10" stroke-width="3"/>
+  <circle cx="300" cy="420" r="9" fill="url(#gMetal)" stroke="#555c66" stroke-width="2"/>`,
+    desc:'Connects the front wheel to the steering head and soaks up bumps. The gold coating reduces friction in the sliding surfaces.',
+    specs:[['Type','Upside-down telescopic'],['Tube','41 mm'],['Travel','≈ 120 mm'],['Adjust','Preload & rebound']],
+    func:'Front suspension' },
+
+  // 13 · FAIRING PANELS – sharp-edged body, windscreen, LED headlight, air intake, stripes and belly pan
+  { id:'fairing', name:'Fairing Panels', step:13, ex:[-165,-95],
+    short:'Aerodynamic bodywork and headlight.',
+    svg:`<path d="M398 420 L476 434 L556 448 L566 460 L478 464 L404 446 Z" fill="url(#gSec)" stroke="${T.mainEdge}" stroke-width="1.6" stroke-linejoin="miter"/>
+  <path d="M422 432 L540 454" stroke="${T.s1}" stroke-width="2"/>
+  <path d="M312 302 L332 268 L388 246 L440 262 L480 318 L488 374 L470 406 L430 426 L392 420 L356 392 L332 346 Z" fill="url(#gSec)" stroke="${T.mainEdge}" stroke-width="1.8" stroke-linejoin="miter"/>
+  <path d="M400 418 L440 424 L468 404" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.6"/>
+  <path d="M312 302 L332 268 L388 246 L440 262 L468 298 L424 300 L378 318 L346 338 L326 322 Z" fill="url(#gMain)" stroke="${T.mainEdge}" stroke-width="1.6" stroke-linejoin="miter"/>
+  <path d="M322 292 L340 270 L388 252" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2.4" stroke-linejoin="miter"/>
+  <ellipse cx="352" cy="278" rx="9" ry="3.5" fill="rgba(255,255,255,.55)" transform="rotate(-24 352 278)"/>
+  <path d="M346 304 L398 276 L452 270" fill="none" stroke="${T.s1}" stroke-width="3.2" stroke-linejoin="miter"/>
+  <path d="M350 311 L402 283 L456 277" fill="none" stroke="${T.s2}" stroke-width="1.6" stroke-linejoin="miter"/>
+  <path d="M366 366 L440 334 L486 336 L484 350 L446 350 L386 384 Z" fill="url(#gMain)"/>
+  <path d="M394 396 L448 372 L484 372 L482 380 L452 382 L408 406 Z" fill="url(#gMain)"/>
+  <path d="M350 350 L440 312 L476 316" fill="none" stroke="${T.s1}" stroke-width="2.6" stroke-linejoin="miter"/>
+  <path d="M356 342 L444 304 L480 308" fill="none" stroke="${T.s2}" stroke-width="1.2" stroke-linejoin="miter" opacity=".9"/>
+  <path d="M350 268 L392 190 L452 206 L442 258 L392 246 Z" fill="url(#gGlass)" stroke="#b4d6f4" stroke-width="1.6" stroke-linejoin="miter"/>
+  <path d="M368 252 L396 200 L438 212" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.8"/>
+  <path d="M372 266 L420 256 L414 270 L384 278 Z" fill="#050607" stroke="${T.mainEdge}" stroke-width="1.2"/><path d="M380 274 L412 266" stroke="rgba(255,255,255,.35)" stroke-width="1.4"/>
+  <g transform="translate(-12,6)"><path d="M322 294 L376 272 L388 280 L344 310 L330 306 Z" fill="#06080a" stroke="${T.line3}" stroke-width="1.5" stroke-linejoin="miter"/>
+  <path d="M332 294 L372 278 L378 283 L346 303 Z" fill="url(#gLens)"/>
+  <circle cx="352" cy="291" r="3.4" fill="#fff" stroke="#7d8896"/><circle cx="368" cy="284" r="3" fill="#fff" stroke="#7d8896"/>
+  <path d="M330 300 L376 280" stroke="#9fd0ff" stroke-width="1.6"/></g>
+  <path d="M410 330 L446 322 L458 340 L424 350 Z" fill="#020304" stroke="${T.mainEdge}" stroke-width="1.2"/>
+  ${[0,1,2].map(i=>`<path d="M${440+i*10} ${396-i*6} L${452+i*10} ${390-i*6}" stroke="${T.s1}" stroke-width="2.6" stroke-linecap="square"/>`).join('')}
+  <path d="M336 322 L352 316 L355 324 L340 330 Z" fill="#ffb02e" stroke="#9a6200"/>
+  <circle cx="400" cy="376" r="2" fill="#9aa5b1"/><circle cx="472" cy="362" r="2" fill="#9aa5b1"/><circle cx="356" cy="338" r="2" fill="#9aa5b1"/>
+  <text x="402" y="408" font-size="13" font-style="italic" font-weight="700" fill="${T.badge}" font-family="'Brush Script MT','Segoe Script',cursive" transform="rotate(-24 402 408)">${T.badgeText}</text>`,
+    desc:'The fairing cuts through the air to improve stability at speed, shields the rider from wind and routes air to the radiator and engine. It also holds the headlight, windscreen, intake duct and turn signals, and protects the frame and engine in a minor slide.',
+    specs:[['Material','ABS plastic (injection moulded)'],['Finish','Gloss lime green + black, clear coat'],['Windscreen','Polycarbonate, 3 mm'],['Headlight','Dual-LED projector'],['Panels','Nose, 2 sides, belly pan'],['Fasteners','Plastic clips + M5 screws']],
+    func:'Aerodynamics & protection' },
+
+  // 10 · FUEL TANK – angular tank with highlight, green line and filler cap
+  { id:'tank', name:'Fuel Tank', step:10, ex:[-5,-150],
+    short:'≈ 15 L tank with knee recesses.',
+    svg:`<path d="M394 254 L450 226 L562 222 L604 246 L608 272 L562 286 L440 286 Z" fill="url(#gMain)" stroke="${T.mainEdge}" stroke-width="1.8" stroke-linejoin="miter"/>
+  <path d="M408 252 L454 234 L560 230 L592 248" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.6"/>
+  <path d="M430 270 L520 260 L598 264" fill="none" stroke="${T.tankLine}" stroke-width="4"/>
+  <path d="M470 286 L496 272 L560 270 L580 286 Z" fill="rgba(0,0,0,.28)"/>
+  <ellipse cx="478" cy="231" rx="16" ry="4.5" fill="#050607" stroke="${T.mainEdge}" stroke-width="1.5"/>
+  <text x="498" y="254" font-size="11" font-style="italic" font-weight="800" fill="${T.tankText}" font-family="system-ui,sans-serif">${T.tankLabel}</text>`,
+    desc:'Stores fuel and shapes the rider’s knee-grip position. Inside are the fuel pump, level sender and baffles.',
+    specs:[['Capacity','15 L'],['Material','Steel / plastic cover'],['Pump','In-tank, EFI'],['Filler','Quick-release cap']],
+    func:'Fuel storage' },
+
+  // 11 · SEAT & TAIL – seat, tail cowl, red LED strip and number-plate holder
+  { id:'seat', name:'Seat & Tail', step:11, ex:[115,-135],
+    short:'Two-piece seat with raised tail cowl.',
+    svg:`<path d="M572 254 L640 240 L690 254 L742 238 L800 214 L884 190 L902 198 L876 252 L800 272 L600 288 Z" fill="url(#gBlack)" stroke="#5a6572" stroke-width="1.8" stroke-linejoin="miter"/>
+  <path d="M584 256 L640 244 L688 258" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+  <path d="M600 266 L742 250" fill="none" stroke="#56606b" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <path d="M742 240 L802 216 L884 192 L872 238 L800 260 L744 260 Z" fill="url(#gMain)" stroke="${T.mainEdge}" stroke-width="1.6" stroke-linejoin="miter"/>
+  <path d="M752 238 L806 218 L878 196" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+  <path d="M770 256 L850 236" fill="none" stroke="${T.s1}" stroke-width="3"/><path d="M772 250 L850 230" fill="none" stroke="${T.s2}" stroke-width="1.3"/>
+  <path d="M876 190 L904 198 L898 212 L870 204 Z" fill="#ff3b3b" stroke="#a31d1d"/><path d="M882 195 L898 199" stroke="#ffd0d0" stroke-width="1.5"/>
+  <g transform="translate(4,-8)"><path d="M840 262 L870 256 L888 296 L858 302 Z" fill="#101316" stroke="#4a535e" stroke-width="1.5"/>
+  <rect x="862" y="282" width="36" height="22" rx="2" fill="#f2f4f6" stroke="#6a7480" transform="rotate(-10 880 293)"/>
+  <rect x="866" y="286" width="28" height="14" rx="1" fill="none" stroke="#222" stroke-width="1" transform="rotate(-10 880 293)"/>
+  <path d="M846 258 L858 254 L860 262 L848 266 Z" fill="#ffb02e" stroke="#9a6200"/></g>`,
+    desc:'Supports rider and passenger. The tail cowl houses the tail light and licence-plate bracket.',
+    specs:[['Height','785 mm'],['Material','Foam / PU cover'],['Lock','Key-release'],['Storage','Under-seat tool tray']],
+    func:'Rider seating' },
+
+  // 12 · HANDLEBAR – clip-on bar, grips, brake lever, reservoir and mirror
+  { id:'handlebar', name:'Handlebar', step:12, ex:[-30,-135],
+    short:'Clip-on bars with controls.',
+    svg:`<path d="M392 238 L424 226 L456 216" fill="none" stroke="#2a2f35" stroke-width="10" stroke-linecap="round"/>
+  <path d="M392 238 L424 226 L456 216" fill="none" stroke="#7b828c" stroke-width="5" stroke-linecap="round"/>
+  <rect x="440" y="206" width="30" height="13" rx="6" fill="#16191c" stroke="#3a4048" transform="rotate(-20 455 212)"/>
+  <rect x="418" y="224" width="16" height="12" rx="3" fill="#20252b" stroke="#4d545c"/>
+  <path d="M428 224 L404 238" stroke="#9aa0a9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M432 220 L426 186" stroke="#6a7480" stroke-width="5" stroke-linecap="round"/>
+  <path d="M398 176 L442 164 L454 180 L412 194 Z" fill="#0f1215" stroke="#7a8592" stroke-width="1.6" stroke-linejoin="miter"/>
+  <path d="M406 180 L440 170" stroke="rgba(190,210,235,.5)" stroke-width="2"/>`,
+    desc:'Gives steering input and carries throttle, clutch, brake lever, switches and mirrors.',
+    specs:[['Type','Clip-on'],['Material','Aluminium'],['Controls','Throttle, levers, switchgear'],['Mirrors','Folding']],
+    func:'Steering & controls' }
+];
+
+// ---------- care & maintenance data ----------
+// Maintenance advice per part id. Fields:
+//   every  how often to check/service      tips  list of practical steps      warn  safety warning
+// Shown in the side panel (careHTML) and as a one-liner in the pop-up card.
+const CARE = {
+  fairing:{every:'Wash weekly · inspect monthly',tips:['Rinse dust off first, then wash with bike shampoo and a soft microfibre mitt.','Never scrub dry; grit scratches gloss paint.','Wax or polymer sealant every 2–3 months protects the clear coat and UV.','Check clips and screws monthly; a loose panel rattles and cracks.','Clean the windscreen with water and a soft cloth only, no glass cleaner or alcohol (it crazes polycarbonate).'],warn:'Cracked ABS should be repaired or replaced, not ignored; vibration spreads cracks.'},
+  engine:{every:'Oil every 6,000 km / 12 months',tips:['Check oil level on the sight glass weekly, with the bike upright and warm.','Change oil and filter on schedule; use the grade in the manual (JASO MA2 for wet clutch).','Replace the air filter every 12,000 km, sooner in dusty areas.','Let the engine warm up before high revs; avoid hard rev-limiter hits when cold.','Check spark plugs and valve clearance at the service interval.'],warn:'Never run with low oil or coolant.'},
+  frame:{every:'Inspect every service',tips:['Look for cracks, rust and bends near the steering head and swingarm pivot after any fall.','Touch up chipped paint to stop rust under the coating.','Check steering-head bearing play yearly (lift front wheel and rock the forks).','Tighten swingarm and engine mounting bolts to the torque in the manual.'],warn:'A bent or cracked frame must be checked by a specialist.'},
+  fork:{every:'Fork oil every 20,000 km / 2 years',tips:['Wipe the inner tubes after each ride; dirt and bugs tear seals.','Look for oil film on the tubes. Leaking seals need replacing.','Change fork oil and check seals every ~20,000 km.','Check both sides are set to the same preload and damping.'],warn:'Never ride with leaking fork seals; oil can reach the brake disc.'},
+  frontwheel:{every:'Check before every ride',tips:['Check tyre pressure cold: usually about 32 psi front (see the manual).','Look for cuts, nails and cracks; replace tyres at the wear indicator (1.6 mm minimum).','Inspect rim for dents or cracks after potholes.','Check brake pad thickness monthly (replace at 1.5 mm).','Change brake fluid every 2 years.'],warn:'Tyre pressure and brakes are the most safety-critical checks.'},
+  rearwheel:{every:'Check before every ride',tips:['Check tyre pressure cold: usually about 36 psi rear (see the manual).','Replace tyres at the wear indicator or when more than 5–6 years old.','Check wheel nut torque and cotter pin after tyre changes.','Inspect the rear sprocket for hooked or shark-fin teeth.'],warn:'Do not ride on a bulging or cracked tyre.'},
+  swingarm:{every:'Grease pivot every 12,000 km',tips:['Check for play by pushing the rear wheel side to side.','Grease linkage and swingarm bearings yearly, more often in rain.','Keep the chain guard and slider clean and unworn.','Re-torque pivot nut at service intervals.'],warn:'Any side play means worn bearings; fix before riding.'},
+  rearshock:{every:'Service every 25,000 km',tips:['Look for oil on the shock body: a sign of a failing seal.','Set preload for your weight and luggage, then re-check.','Clean mud from the spring and linkage after wet rides.','Rebuild or replace when the bike feels bouncy or sags.'],warn:'Never loosen the shock under spring tension; use proper tools.'},
+  exhaust:{every:'Check every 6 months',tips:['Check for leaks at the head flange; ticking noise or soot are signs.','Check mounting bolts and rubber hangers are tight.','Never pour cold water on a hot exhaust.','Polish stainless gently; avoid steel wool on the silencer.','Do not remove the catalyst; it is legally required.'],warn:'A hot exhaust can burn skin and melt clothing; let it cool first.'},
+  radiator:{every:'Coolant every 2 years',tips:['Check coolant level in the reservoir when cold.','Replace coolant every 2 years or per manual.','Rinse fins gently from behind with a low-pressure hose; never use a pressure washer.','Straighten bent fins carefully with a comb tool.','Check hoses for cracks or soft spots.'],warn:'Never open the radiator cap on a hot engine.'},
+  tank:{every:'Inspect every 6 months',tips:['Avoid running very low; the pump uses fuel to stay cool.','Use the recommended octane and clean fuel.','Wash fuel spills off the paint straight away.','Check the cap seal and breather hose are not blocked.','For long storage, fill the tank and add stabiliser.'],warn:'Keep sparks and flames away; fuel vapour is flammable.'},
+  seat:{every:'Wipe monthly',tips:['Wipe with a damp cloth; avoid harsh cleaners that dry the vinyl.','Use a vinyl protector (not slippery) on the cover.','Check the lock and latch work smoothly.','Keep the cover dry to avoid mould in the foam.'],warn:'Check the seat is latched before every ride.'},
+  handlebar:{every:'Check weekly',tips:['Check clutch and brake levers; adjust free play per manual.','Lubricate lever pivots and clean throttle cable every 6 months.','Check the throttle snaps closed when released.','Check mirrors, switches and clip-on bolts are tight.'],warn:'Stiff throttle or loose bars is a stop-and-fix problem.'}
+};
+// Attach each care entry to its part object
+parts.forEach(p => p.care = CARE[p.id]);
+// ---- apply this model's own names/specs on top of the shared parts ----
+parts.forEach(p => Object.assign(p, BIKE.ovr[p.id] || {}));
+CARE.engine.tips.push(BIKE.extraCare);   // one bike-specific engine care tip
+// careHTML(p, short)
+// short = true  -> one-line "Check: every …" for the small pop-up card
+// short = false -> full box with interval, tip list and warning for the side panel
+function careHTML(p, short){
+  const c = p.care; if (!c) return '';
+  if (short) return `<div class="care"><b>🛠 ${c.every}</b></div>`;
+  return `<div class="careBox"><h5>How to take care of it</h5><div class="every">⏱ ${c.every}</div>
+    <ul>${c.tips.map(t=>`<li>${t}</li>`).join('')}</ul><div class="warn">⚠ ${c.warn}</div></div>`;
+}
+
+// ---------- build ----------
+// SVG namespace (needed when creating SVG elements from JavaScript)
+const NS = 'http://www.w3.org/2000/svg';
+// Grab the page elements we use often so we only look them up once
+const partsLayer = document.getElementById('parts');
+const guideLayer = document.getElementById('guides');
+const stage = document.getElementById('stage');
+const tip = document.getElementById('tip');
+const stepsEl = document.getElementById('steps');
+const logEl = document.getElementById('log');
+const hint = document.getElementById('hint');
+const stateEl = document.getElementById('state');
+const btnToggle = document.getElementById('btnToggle');
+const range = document.getElementById('range');
+
+// For every part: create its <g> group, add a number badge, a guide line and a list item.
+//   p.el = the group   p.cx/p.cy = centre of the part   p.prog = explode progress (0 assembled … 1 exploded)
+//   p.tw = running animation (or null)
+parts.forEach((p, i) => {
+  p.i = i; p.prog = 0; p.tw = null;
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('class', 'part');
+  g.dataset.id = p.id;
+  g.innerHTML = p.svg;
+  partsLayer.appendChild(g);
+  p.el = g;
+
+  // home center from bbox
+  const b = g.getBBox();
+  p.cx = b.x + b.width / 2; p.cy = b.y + b.height / 2;
+
+  // number badge (moves with part)
+  const badge = document.createElementNS(NS, 'g');
+  badge.setAttribute('style', 'pointer-events:none;opacity:0');
+  badge.innerHTML = `<circle cx="${p.cx}" cy="${p.cy}" r="12" fill="#3ddc6c"/><text x="${p.cx}" y="${p.cy+4}" text-anchor="middle" font-size="12" font-weight="700" fill="#04120a" font-family="system-ui">${p.step}</text>`;
+  g.appendChild(badge);
+  p.badge = badge;
+
+  // guide line
+  const ln = document.createElementNS(NS, 'line');
+  ln.setAttribute('stroke', '#3ddc6c'); ln.setAttribute('stroke-dasharray', '5 6'); ln.setAttribute('stroke-opacity', '0');
+  ln.setAttribute('x1', p.cx); ln.setAttribute('y1', p.cy);
+  guideLayer.appendChild(ln);
+  p.guide = ln;
+
+  // step list item
+  const li = document.createElement('li');
+  li.dataset.id = p.id;
+  li.innerHTML = `<span>${p.step}</span>${p.name}`;
+  p.li = li;
+});
+[...parts].sort((a,b)=>a.step-b.step).forEach(p => stepsEl.appendChild(p.li));
+
+// ---------- animation ----------
+// Smooth start/finish curve (cubic ease-in-out): t from 0..1 -> eased 0..1
+function ease(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+// apply(p): position one part for its current progress p.prog
+// Moves the part by ex * eased progress, stretches its guide line, and shows the badge once nearly exploded.
+function apply(p){
+  const e = ease(p.prog);
+  p.el.setAttribute('transform', `translate(${(p.ex[0]*e).toFixed(2)},${(p.ex[1]*e).toFixed(2)})`);
+  p.guide.setAttribute('x2', p.cx + p.ex[0]*e);
+  p.guide.setAttribute('y2', p.cy + p.ex[1]*e);
+  p.guide.setAttribute('stroke-opacity', (e*0.55).toFixed(2));
+  p.badge.style.opacity = e > .85 ? 1 : 0;
+}
+// tween(p, to, delay, dur): start animating a part towards progress "to" after "delay" ms, lasting "dur" ms
+function tween(p, to, delay, dur){
+  p.tw = { from:p.prog, to, start: performance.now()+delay, dur };
+}
+// Animation loop: runs every frame while any part is still moving, then stops and unlocks the UI
+let raf = null;
+function loop(now){
+  let active = false;
+  parts.forEach(p => {
+    if (!p.tw) return;
+    const t = (now - p.tw.start) / p.tw.dur;
+    if (t < 0) { active = true; return; }
+    if (t >= 1) { p.prog = p.tw.to; p.tw = null; apply(p); return; }
+    p.prog = p.tw.from + (p.tw.to - p.tw.from) * t;
+    apply(p); active = true;
+  });
+  if (active) raf = requestAnimationFrame(loop); else { raf = null; busy = false; syncUI(); }
+}
+// Start the animation loop if it is not already running
+function kick(){ if (!raf) raf = requestAnimationFrame(loop); }
+
+// exploded = parts are (or are going) apart      busy = an animation is running (clicks are ignored)
+// timers = pending setTimeout ids so we can cancel them on reset
+let exploded = false, busy = false;
+const timers = [];
+function clearTimers(){ timers.forEach(clearTimeout); timers.length = 0; }
+// say(msg): add a line to the Process log (keeps only the last 40 lines and scrolls to the bottom)
+function say(msg){
+  const li = document.createElement('li'); li.textContent = msg;
+  logEl.appendChild(li);
+  while (logEl.children.length > 40) logEl.removeChild(logEl.firstChild);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// explode(): fly all parts apart, outermost step first, one after another (90 ms apart)
+function explode(){
+  if (busy) return;
+  clearTimers(); busy = true; exploded = true; deselect();
+  say('Explode started — removing parts from outermost to innermost');
+  const order = [...parts].sort((a,b)=>b.step-a.step);
+  order.forEach((p, k) => {
+    tween(p, 1, k*90, 700);
+    timers.push(setTimeout(() => say(`Removed: ${p.name}`), k*90));
+  });
+  timers.push(setTimeout(() => say('Exploded view complete — hover or click a part'), order.length*90+700));
+  kick(); syncUI();
+}
+// assemble(): fly parts back together in build order (frame first), 260 ms apart, ticking the step list
+function assemble(){
+  if (busy) return;
+  clearTimers(); busy = true; exploded = false; deselect();
+  say('Assembly sequence started — building from frame outward');
+  const order = [...parts].sort((a,b)=>a.step-b.step);
+  order.forEach((p, k) => {
+    tween(p, 0, k*260, 650);
+    timers.push(setTimeout(() => { say(`Step ${p.step}: install ${p.name}`); p.li.classList.add('done'); }, k*260));
+  });
+  timers.push(setTimeout(() => { say('Bike fully assembled ✔'); }, order.length*260+650));
+  kick(); syncUI();
+}
+// syncUI(): refresh button text, state badge, hint pill and slider to match the current state
+function syncUI(){
+  stage.classList.toggle('exploded', exploded);
+  btnToggle.textContent = exploded ? 'Assemble' : 'Explode';
+  stateEl.textContent = 'State: ' + (busy ? 'moving…' : (exploded ? 'exploded' : 'assembled'));
+  hint.style.opacity = (!exploded && !busy) ? 1 : 0;
+  range.value = Math.round(Math.max(...parts.map(p=>p.prog)) * 100);
+  if (!exploded && !busy) parts.forEach(p => p.li.classList.remove('done'));
+}
+
+// ---------- square pop-up card ----------
+// ---- pop-up card helpers ----
+const pop = document.getElementById('pop');
+const connLine = document.getElementById('connLine');
+const connDot = document.getElementById('connDot');
+// placePop(): put the 250x250 card beside the selected part (right side if it fits, else left),
+// keep it inside the stage, and draw the dashed connector line + dot from the part to the card.
+function placePop(){
+  if (!selected) return;
+  const s = stage.getBoundingClientRect();
+  const r = selected.el.getBoundingClientRect();
+  const W = 250, H = 250, gap = 28;
+  const px = r.left - s.left + r.width/2, py = r.top - s.top + r.height/2;
+  let x = r.right - s.left + gap;                       // prefer right of the part
+  if (x + W > s.width - 8) x = r.left - s.left - gap - W; // else left
+  x = Math.max(8, Math.min(x, s.width - W - 8));
+  let y = Math.max(8, Math.min(py - H/2, s.height - H - 8));
+  pop.style.left = x + 'px'; pop.style.top = y + 'px';
+  const ex = x < px ? x + W : x;                        // card edge nearest the part
+  connLine.setAttribute('x1', px); connLine.setAttribute('y1', py);
+  connLine.setAttribute('x2', ex); connLine.setAttribute('y2', y + H/2);
+  connDot.setAttribute('cx', px); connDot.setAttribute('cy', py);
+  connLine.setAttribute('opacity', 1); connDot.setAttribute('opacity', 1);
+}
+// showPop(p): fill the card with the part's info, position it, and fade it in. The × button closes it.
+function showPop(p){
+  pop.innerHTML = `<button class="x" title="Close">×</button><span class="no">Step ${p.step}</span><h4>${p.name}</h4><p>${p.short}</p>
+    <table>${[['Function',p.func],...p.specs.slice(0,1)].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>${careHTML(p,true)}`;
+  pop.querySelector('.x').onclick = e => { e.stopPropagation(); deselect(); };
+  placePop();
+  pop.classList.add('show');
+}
+// hidePop(): fade the card out and hide the connector line
+function hidePop(){
+  pop.classList.remove('show');
+  connLine.setAttribute('opacity', 0); connDot.setAttribute('opacity', 0);
+}
+// Re-position the card if the window size changes
+addEventListener('resize', placePop);
+
+// ---------- selection / detail ----------
+// The currently selected part object (or null)
+let selected = null;
+// select(p): highlight a part, dim the others, fill the side panel (with care box) and open the pop-up card
+function select(p){
+  deselect(true);
+  selected = p;
+  p.el.classList.add('sel'); p.li.classList.add('sel');
+  stage.classList.add('has-sel');
+  document.getElementById('placeholder').hidden = true;
+  const d = document.getElementById('detailBody'); d.hidden = false;
+  d.innerHTML = `<span class="no">Step ${p.step}</span><h3>${p.name}</h3><p>${p.desc}</p>
+    <table>${[['Function',p.func],...p.specs].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>${careHTML(p)}`;
+  say(`Selected: ${p.name}`);
+  tip.style.opacity = 0;
+  showPop(p);
+}
+// deselect(silent): clear the selection. silent=true keeps the side panel as-is (used when switching parts)
+function deselect(silent){
+  if (selected){ selected.el.classList.remove('sel'); selected.li.classList.remove('sel'); }
+  selected = null; stage.classList.remove('has-sel');
+  hidePop();
+  if (!silent){
+    document.getElementById('placeholder').hidden = false;
+    document.getElementById('detailBody').hidden = true;
+  }
+}
+
+// ---------- events ----------
+// CLICK on a part:
+//   - bike assembled -> explode it   - exploded -> select that part (click again to deselect)
+//   - ignored while an animation is running
+partsLayer.addEventListener('click', e => {
+  const g = e.target.closest('.part'); if (!g) return;
+  e.stopPropagation();
+  if (busy) return;
+  if (!exploded) { say('Bike clicked'); explode(); return; }
+  const p = parts.find(x => x.id === g.dataset.id);
+  selected === p ? deselect() : select(p);
+});
+// CLICK on empty space of the canvas -> close the selection
+document.getElementById('svg').addEventListener('click', () => {
+  if (!busy && exploded && selected) deselect();
+});
+// HOVER: show the small tooltip near the mouse (only when exploded and not animating)
+partsLayer.addEventListener('mousemove', e => {
+  const g = e.target.closest('.part');
+  if (!g || !exploded || busy) { tip.style.opacity = 0; return; }
+  const p = parts.find(x => x.id === g.dataset.id);
+  tip.innerHTML = `<b>${p.step}. ${p.name}</b>${p.short}<i>Click for full details</i>`;
+  tip.style.opacity = 1;
+  const x = Math.min(e.clientX + 16, innerWidth - 240);
+  tip.style.left = x + 'px'; tip.style.top = (e.clientY + 16) + 'px';
+});
+// Hide the tooltip when the mouse leaves the bike
+partsLayer.addEventListener('mouseleave', () => tip.style.opacity = 0);
+// Clicking a row in the Assembly order list selects that part
+stepsEl.addEventListener('click', e => {
+  const li = e.target.closest('li'); if (!li || !exploded || busy) return;
+  select(parts.find(x => x.id === li.dataset.id));
+});
+// Main button toggles between explode and assemble
+btnToggle.onclick = () => exploded ? assemble() : explode();
+// "Play assembly sequence": if assembled, jump to exploded first, then animate the build step by step
+document.getElementById('btnAssemble').onclick = () => {
+  if (busy) return;
+  if (!exploded) {
+    // jump to exploded instantly, then play the build sequence
+    parts.forEach(p => { p.prog = 1; apply(p); });
+    exploded = true; syncUI();
+  }
+  assemble();
+};
+// Reset: cancel everything, snap all parts back, clear selection and log
+document.getElementById('btnReset').onclick = () => {
+  clearTimers(); parts.forEach(p => { p.tw = null; p.prog = 0; apply(p); });
+  busy = false; exploded = false; deselect(); syncUI(); logEl.innerHTML = ''; say('View reset');
+};
+// Slider: scrub the explode amount manually (0–100%). Cancels any running animation.
+range.addEventListener('input', () => {
+  clearTimers(); busy = false;
+  const v = range.value / 100;
+  parts.forEach(p => { p.tw = null; p.prog = v; apply(p); });
+  exploded = v > .02; stage.classList.toggle('exploded', v > .9);
+  stateEl.textContent = 'State: manual (' + Math.round(v*100) + '%)';
+  hint.style.opacity = v === 0 ? 1 : 0;
+  btnToggle.textContent = exploded ? 'Assemble' : 'Explode';
+});
+
+// ---- START UP: place every part at progress 0, sync the UI, write the first log line ----
+parts.forEach(apply);
+syncUI();
+say('Viewer ready — click the bike to start');
+// ---- fill the model card + page title from BIKE ----
+document.getElementById('model').innerHTML =
+  `<h2>Model</h2><div class="name">${BIKE.brand} ${BIKE.name}</div><div class="tag">${BIKE.tag}</div>
+   <table>${BIKE.quick.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table><a class="brandlink" href="yamaha.html" style="display:inline-block;margin-top:10px;color:var(--accent);font-size:13px;font-weight:700;text-decoration:none">About Yamaha: story &amp; history →</a>`;
+
+</script>
+</body>
+</html>

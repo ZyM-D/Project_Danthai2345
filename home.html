@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Bike World – Home</title>
+<style>
+  :root{--bg:#0b0f14;--bg2:#10161d;--panel:#161b22;--line:#2a313c;--text:#e6edf3;--muted:#8b96a5;--accent:#3ddc6c;--brand:#3ddc6c}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  section{padding:64px 0}
+  h2.title{font-size:clamp(26px,4vw,36px);margin:0 0 8px;letter-spacing:-.5px}
+  p.sub{color:var(--muted);margin:0 0 28px;max-width:640px}
+  .eyebrow{color:var(--brand);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+
+  /* ===== NAV (same on every page) ===== */
+  nav.top{position:sticky;top:0;z-index:20;background:rgba(11,15,20,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav.top .wrap{display:flex;align-items:center;gap:16px;height:60px}
+  .logo{font-weight:800;letter-spacing:.5px;white-space:nowrap}
+  .logo span{color:var(--accent)}
+  nav.top ul{display:flex;gap:4px;list-style:none;margin:0 auto;padding:0;overflow-x:auto;scrollbar-width:none}
+  nav.top ul a{display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:var(--muted);white-space:nowrap}
+  nav.top ul a:hover{color:var(--text);background:var(--panel)}
+  nav.top ul a.on{color:var(--text);background:var(--panel);box-shadow:inset 0 -2px 0 var(--c,var(--accent))}
+  .cta{background:var(--accent);color:#04120a;font-weight:700;padding:8px 14px;border-radius:8px;font-size:14px;white-space:nowrap}
+  @media(max-width:860px){.cta{display:none}nav.top ul{margin:0}}
+
+  .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+  .btn{display:inline-block;padding:12px 20px;border-radius:10px;font-weight:700;font-size:15px;border:1px solid var(--line);background:var(--panel);transition:transform .15s,border-color .15s}
+  .btn:hover{transform:translateY(-2px);border-color:var(--brand)}
+  .btn.primary{background:var(--brand);color:#04120a;border-color:var(--brand)}
+
+  .grid{display:grid;gap:14px}
+  .g5{grid-template-columns:repeat(5,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:1000px){.g5{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:700px){.g5,.g3{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.g5,.g3{grid-template-columns:1fr}}
+  .card{position:relative;display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;color:inherit}
+  .card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:var(--c,var(--accent))}
+  a.card:hover{transform:translateY(-4px);border-color:var(--c,var(--accent));box-shadow:0 12px 30px rgba(0,0,0,.4)}
+  .mono{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;background:var(--c,var(--accent));margin-bottom:12px}
+  .card h3{margin:0;font-size:19px}
+  .card small{color:var(--muted);display:block;margin-top:2px}
+  .card p{color:#b7c1cd;font-size:14px;margin:10px 0 0}
+  .card .more{margin-top:12px;font-size:13px;font-weight:700;color:var(--c,var(--accent))}
+
+  .banner{background:linear-gradient(120deg,#12351f,#0f1a14 60%);border:1px solid #1f4a2c;border-radius:20px;padding:34px;display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .banner h3{margin:0 0 6px;font-size:26px}
+  .banner p{margin:0;color:#b7c1cd}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:13px}
+
+/* ===== NAVBAR (shared structure, each page re-themes it with CSS variables) ===== */
+.site-nav{position:sticky;top:0;z-index:100;background:var(--nav-bg,var(--bg));color:var(--nav-fg,var(--text));border-bottom:1px solid var(--line)}
+.nav-in{max-width:1240px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;gap:18px}
+.nav-logo{font-weight:800;letter-spacing:.6px;white-space:nowrap;font-size:16px;color:inherit;text-decoration:none}
+.nav-logo b{color:var(--accent)}
+.menu{display:flex;align-items:center;gap:4px;margin-left:auto}
+.menu>a,.dd-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:var(--nav-radius,8px);font:inherit;font-size:14px;font-weight:600;color:var(--nav-muted,var(--muted));background:none;border:0;cursor:pointer;text-decoration:none;white-space:nowrap}
+.menu>a:hover,.dd-btn:hover,.dd.open .dd-btn{color:var(--nav-fg,var(--text));background:var(--nav-hover,rgba(128,128,128,.14))}
+.menu>a.on,.dd-btn.on{color:var(--nav-fg,var(--text));box-shadow:inset 0 -2px 0 var(--accent)}
+.dd{position:relative}
+.dd-btn svg{transition:transform .2s}
+.dd.open .dd-btn svg{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:var(--nav-pop,var(--panel));border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .18s,transform .18s,visibility .18s}
+.dd.open .dd-menu{opacity:1;visibility:visible;transform:none}
+@media(hover:hover) and (min-width:901px){.dd:hover .dd-menu{opacity:1;visibility:visible;transform:none}.dd:hover .dd-btn svg{transform:rotate(180deg)}}
+.dd-menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--nav-fg,var(--text));text-decoration:none}
+.dd-menu a:hover,.dd-menu a[aria-current]{background:var(--nav-hover,rgba(128,128,128,.14))}
+.dd-menu i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.menu>a.nav-cta{background:var(--accent);color:var(--nav-cta-fg,#04120a);margin-left:8px}
+.menu>a.nav-cta:hover{filter:brightness(1.1);background:var(--accent);color:var(--nav-cta-fg,#04120a)}
+.burger{display:none;margin-left:auto;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:none;cursor:pointer;position:relative;color:var(--nav-fg,var(--text))}
+.burger span{position:absolute;left:11px;right:11px;height:2px;border-radius:2px;background:currentColor;transition:transform .25s,top .25s,opacity .2s}
+.burger span:nth-child(1){top:14px}.burger span:nth-child(2){top:21px}.burger span:nth-child(3){top:28px}
+.burger[aria-expanded="true"] span:nth-child(1){top:21px;transform:rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){top:21px;transform:rotate(-45deg)}
+body.nav-lock{overflow:hidden}
+@media(max-width:900px){
+  .burger{display:block}
+  .menu{position:fixed;top:64px;left:0;right:0;bottom:0;margin:0;flex-direction:column;align-items:stretch;gap:2px;padding:14px 16px 32px;background:var(--bg);overflow-y:auto;transform:translateX(100%);visibility:hidden;transition:transform .3s,visibility .3s}
+  .menu.open{transform:none;visibility:visible}
+  .menu>a,.dd-btn{width:100%;justify-content:space-between;padding:15px 12px;font-size:18px;border-radius:12px}
+  .menu>a.on,.dd-btn.on{box-shadow:none;background:var(--nav-hover,rgba(128,128,128,.14))}
+  .dd-menu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;background:transparent;padding:0 0 0 14px;max-height:0;overflow:hidden;transition:max-height .3s}
+  .dd.open .dd-menu{max-height:340px}
+  .dd-menu a{padding:13px 12px;font-size:16px}
+  .menu>a.nav-cta{margin:12px 0 0;justify-content:center}
+}
+:root{--nav-bg:rgba(11,15,20,.98);--nav-pop:#12181f}
+  /* ===== HERO ===== */
+  .hero{padding:60px 0 36px;background:radial-gradient(900px 400px at 70% 10%,rgba(61,220,108,.16),transparent 70%),var(--bg)}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center}
+  @media(max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+  .hero h1{font-size:clamp(38px,6vw,66px);line-height:1.02;margin:0 0 16px;letter-spacing:-1.5px}
+  .hero h1 em{font-style:normal;color:var(--accent)}
+  .hero p{color:#b7c1cd;font-size:18px;max-width:520px}
+  .stats{display:flex;gap:28px;margin-top:30px;flex-wrap:wrap}
+  .stats b{display:block;font-size:28px;color:var(--accent)}
+  .stats span{font-size:13px;color:var(--muted)}
+  .art svg{width:100%;height:auto;display:block;overflow:visible}
+  .draw{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 3s ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .spin{transform-box:fill-box;transform-origin:center;animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .speed line{stroke:var(--accent);stroke-opacity:.35;stroke-width:2;animation:zoom 1.6s linear infinite}
+  @keyframes zoom{from{transform:translateX(60px);opacity:0}30%{opacity:1}to{transform:translateX(-80px);opacity:0}}
+</style>
+</head>
+<body>
+<!-- ===== SHARED NAVBAR: Brands dropdown + category links + mobile menu ===== -->
+<header class="site-nav" id="siteNav">
+  <div class="nav-in">
+    <a class="nav-logo" href="home.html">BIG<b>BIKE</b> WORLD</a>
+    <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
+    <nav class="menu" id="navMenu" aria-label="Main">
+      <a href="home.html" class="on" aria-current="page">Home</a>
+      <div class="dd">
+        <button class="dd-btn" type="button" aria-haspopup="true" aria-expanded="false">Brands
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="dd-menu" role="menu"><a href="honda.html" role="menuitem" style="--c:#e60012"><i></i>Honda</a><a href="yamaha.html" role="menuitem" style="--c:#4a74ff"><i></i>Yamaha</a><a href="suzuki.html" role="menuitem" style="--c:#4a8bff"><i></i>Suzuki</a><a href="bmw.html" role="menuitem" style="--c:#2d8cff"><i></i>BMW</a><a href="kawasaki.html" role="menuitem" style="--c:#5bd10a"><i></i>Kawasaki</a></div>
+      </div>
+      <a href="sport.html">Sport Bike</a><a href="naked.html">Naked Bike</a><a href="scooter.html">Scooter</a>
+      <a class="nav-cta" href="cbr250rr.html">Exploded view →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== INTRODUCTION ===== -->
+<header class="hero"><div class="wrap">
+  <div>
+    <div class="eyebrow" style="--brand:var(--accent)">Big bike guide</div>
+    <h1>Five brands.<br>One <em>big</em> story.</h1>
+    <p>A simple guide to the companies behind the world’s most loved big bikes: Honda, Yamaha, Suzuki, BMW and Kawasaki. Pick a brand to read its history, see its signature bikes, or open an exploded view of a bike.</p>
+    <div class="btns"><a class="btn primary" href="#brands" style="--brand:var(--accent)">Choose a brand</a><a class="btn" href="cbr250rr.html">Exploded bike view</a></div>
+    <div class="stats"><div><b>5</b><span>Brand pages</span></div><div><b>140+</b><span>Years of motorcycle history</span></div><div><b>5</b><span>Exploded bike models</span></div></div>
+  </div>
+  <div class="art">
+    <svg viewBox="0 0 560 330" aria-label="Sport bike outline">
+      <g class="speed"><line x1="470" y1="60" x2="540" y2="60"/><line x1="500" y1="110" x2="556" y2="110"/><line x1="480" y1="200" x2="552" y2="200"/><line x1="490" y1="260" x2="548" y2="260"/></g>
+      <ellipse cx="280" cy="292" rx="230" ry="10" fill="#000" opacity=".5"/>
+      <g fill="none" stroke="#3ddc6c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <circle class="draw" cx="110" cy="220" r="66"/><circle class="draw" cx="448" cy="220" r="66"/>
+        <circle class="draw" cx="110" cy="220" r="44" stroke-opacity=".5"/><circle class="draw" cx="448" cy="220" r="44" stroke-opacity=".5"/>
+        <path class="draw" d="M110 220 L168 118 L196 92 L250 78 L300 92 L330 112 L440 96 L470 82 L452 118 L360 138"/>
+        <path class="draw" d="M168 118 L214 150 L262 166 L332 150 L360 138"/>
+        <path class="draw" d="M186 98 L120 214"/><path class="draw" d="M262 166 L330 206 L448 220"/>
+        <path class="draw" d="M236 168 L236 214 L316 214 L316 176"/><path class="draw" d="M250 218 Q300 252 410 246"/>
+      </g>
+      <g stroke="#3ddc6c" stroke-opacity=".55" stroke-width="2"><g class="spin"><line x1="110" y1="190" x2="110" y2="250"/><line x1="80" y1="220" x2="140" y2="220"/><line x1="89" y1="199" x2="131" y2="241"/><line x1="131" y1="199" x2="89" y2="241"/></g>
+      <g class="spin"><line x1="448" y1="190" x2="448" y2="250"/><line x1="418" y1="220" x2="478" y2="220"/><line x1="427" y1="199" x2="469" y2="241"/><line x1="469" y1="199" x2="427" y2="241"/></g></g>
+    </svg>
+  </div>
+</div></header>
+
+<!-- ===== SMALL DETAILS: what you can do here ===== -->
+<section style="padding:36px 0 8px"><div class="wrap">
+  <div class="grid g3">
+    <div class="card" style="--c:#3ddc6c"><h3>Brand stories</h3><p>One page for each brand: where it started, the people behind it and what it is known for.</p></div>
+    <div class="card" style="--c:#35a0ff"><h3>Signature bikes</h3><p>Three famous big bikes from every brand, with engine size and power in plain numbers.</p></div>
+    <div class="card" style="--c:#ffb02e"><h3>Exploded views</h3><p>Take a bike apart on screen, learn what each part does and how to look after it.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== BRANDS (links to the five brand pages) ===== -->
+<section id="brands"><div class="wrap">
+  <div class="eyebrow" style="--brand:var(--accent)">Brands</div>
+  <h2 class="title">Choose a brand</h2>
+  <p class="sub">Each brand has its own page with its history, key moments and signature bikes.</p>
+  <div class="grid g5"><a class="card" href="honda.html" style="--c:#e60012"><div class="mono">H</div><h3>Honda</h3><small>Japan · since 1948</small><p>The world’s largest motorcycle maker.</p><div class="more">Read the story →</div></a><a class="card" href="yamaha.html" style="--c:#1f4fd8"><div class="mono">Y</div><h3>Yamaha</h3><small>Japan · since 1955</small><p>Handling, music and racing in one brand.</p><div class="more">Read the story →</div></a><a class="card" href="suzuki.html" style="--c:#2f6fe0"><div class="mono">S</div><h3>Suzuki</h3><small>Japan · since 1909</small><p>Fast, light and full of attitude.</p><div class="more">Read the story →</div></a><a class="card" href="bmw.html" style="--c:#2d8cff"><div class="mono">B</div><h3>BMW</h3><small>Germany · since 1916</small><p>Engineering, comfort and adventure.</p><div class="more">Read the story →</div></a><a class="card" href="kawasaki.html" style="--c:#5bd10a"><div class="mono">K</div><h3>Kawasaki</h3><small>Japan · since 1896</small><p>Let the good times roll.</p><div class="more">Read the story →</div></a></div>
+</div></section>
+
+<!-- ===== BY TYPE: the three category pages ===== -->
+<section style="padding-top:8px"><div class="wrap">
+  <div class="eyebrow" style="--brand:var(--accent)">Explore by type</div>
+  <h2 class="title">What kind of ride?</h2>
+  <p class="sub">Not sure about a brand yet? Start with the style of bike.</p>
+  <div class="grid g3">
+    <a class="card" href="sport.html" style="--c:#ff2e3b"><h3>Sport Bike</h3><small>Racing · aerodynamics · speed</small><p>Fairings, leaning angles and race-bred electronics.</p><div class="more">Open Sport →</div></a>
+    <a class="card" href="naked.html" style="--c:#ff9f1c"><h3>Naked Bike</h3><small>Street · raw · urban</small><p>Exposed engines, upright posture and city attitude.</p><div class="more">Open Naked →</div></a>
+    <a class="card" href="scooter.html" style="--c:#18b8a6"><h3>Scooter</h3><small>Lifestyle · practical · touring</small><p>From 150 cc city scooters to 750 cc maxi-scooters.</p><div class="more">Open Scooter →</div></a>
+  </div>
+</div></section>
+
+<!-- ===== EXPLODED VIEW BANNER ===== -->
+<section style="padding-top:8px"><div class="wrap"><div class="banner">
+  <div><h3>See how a big bike is built</h3><p>Open the interactive exploded view: click the bike, take it apart and learn how to look after every part.</p></div>
+  <a class="btn primary" href="cbr250rr.html" style="--brand:var(--accent)">Open exploded bike →</a>
+</div></div></section>
+<footer><div class="wrap">Example site for learning. Dates and figures are simplified and approximate; check each manufacturer for official details. Brand names belong to their owners; no logos are used here.</div></footer>
+<script>
+// ===== NAVBAR behaviour: dropdown, mobile menu, Esc / outside click to close =====
+(function(){
+  const nav = document.getElementById('siteNav'); if (!nav) return;
+  const burger = nav.querySelector('.burger'), menu = nav.querySelector('.menu');
+  const dds = [...nav.querySelectorAll('.dd')];
+  function closeDropdowns(){ dds.forEach(d => { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded','false'); }); }
+  function closeMenu(){ menu.classList.remove('open'); burger.setAttribute('aria-expanded','false'); burger.setAttribute('aria-label','Open menu'); document.body.classList.remove('nav-lock'); }
+  burger.addEventListener('click', () => {
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open); burger.setAttribute('aria-expanded', open);
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('nav-lock', open);
+  });
+  dds.forEach(d => {
+    const b = d.querySelector('.dd-btn');
+    b.addEventListener('click', e => { e.stopPropagation(); const open = !d.classList.contains('open'); closeDropdowns(); d.classList.toggle('open', open); b.setAttribute('aria-expanded', open); });
+  });
+  document.addEventListener('click', e => { if (!nav.contains(e.target)) closeDropdowns(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ closeDropdowns(); closeMenu(); } });
+  matchMedia('(min-width:901px)').addEventListener('change', e => { if (e.matches) closeMenu(); });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+})();
+</script>
+</body>
+</html>

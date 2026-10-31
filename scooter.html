@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scooters &amp; Maxi-Scooters – Everyday Freedom</title>
+<style>
+
+/* ===== NAVBAR (shared structure, each page re-themes it with CSS variables) ===== */
+.site-nav{position:sticky;top:0;z-index:100;background:var(--nav-bg,var(--bg));color:var(--nav-fg,var(--text));border-bottom:1px solid var(--line)}
+.nav-in{max-width:1240px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;gap:18px}
+.nav-logo{font-weight:800;letter-spacing:.6px;white-space:nowrap;font-size:16px;color:inherit;text-decoration:none}
+.nav-logo b{color:var(--accent)}
+.menu{display:flex;align-items:center;gap:4px;margin-left:auto}
+.menu>a,.dd-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:var(--nav-radius,8px);font:inherit;font-size:14px;font-weight:600;color:var(--nav-muted,var(--muted));background:none;border:0;cursor:pointer;text-decoration:none;white-space:nowrap}
+.menu>a:hover,.dd-btn:hover,.dd.open .dd-btn{color:var(--nav-fg,var(--text));background:var(--nav-hover,rgba(128,128,128,.14))}
+.menu>a.on,.dd-btn.on{color:var(--nav-fg,var(--text));box-shadow:inset 0 -2px 0 var(--accent)}
+.dd{position:relative}
+.dd-btn svg{transition:transform .2s}
+.dd.open .dd-btn svg{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:var(--nav-pop,var(--panel));border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .18s,transform .18s,visibility .18s}
+.dd.open .dd-menu{opacity:1;visibility:visible;transform:none}
+@media(hover:hover) and (min-width:901px){.dd:hover .dd-menu{opacity:1;visibility:visible;transform:none}.dd:hover .dd-btn svg{transform:rotate(180deg)}}
+.dd-menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--nav-fg,var(--text));text-decoration:none}
+.dd-menu a:hover,.dd-menu a[aria-current]{background:var(--nav-hover,rgba(128,128,128,.14))}
+.dd-menu i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.menu>a.nav-cta{background:var(--accent);color:var(--nav-cta-fg,#04120a);margin-left:8px}
+.menu>a.nav-cta:hover{filter:brightness(1.1);background:var(--accent);color:var(--nav-cta-fg,#04120a)}
+.burger{display:none;margin-left:auto;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:none;cursor:pointer;position:relative;color:var(--nav-fg,var(--text))}
+.burger span{position:absolute;left:11px;right:11px;height:2px;border-radius:2px;background:currentColor;transition:transform .25s,top .25s,opacity .2s}
+.burger span:nth-child(1){top:14px}.burger span:nth-child(2){top:21px}.burger span:nth-child(3){top:28px}
+.burger[aria-expanded="true"] span:nth-child(1){top:21px;transform:rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){top:21px;transform:rotate(-45deg)}
+body.nav-lock{overflow:hidden}
+@media(max-width:900px){
+  .burger{display:block}
+  .menu{position:fixed;top:64px;left:0;right:0;bottom:0;margin:0;flex-direction:column;align-items:stretch;gap:2px;padding:14px 16px 32px;background:var(--bg);overflow-y:auto;transform:translateX(100%);visibility:hidden;transition:transform .3s,visibility .3s}
+  .menu.open{transform:none;visibility:visible}
+  .menu>a,.dd-btn{width:100%;justify-content:space-between;padding:15px 12px;font-size:18px;border-radius:12px}
+  .menu>a.on,.dd-btn.on{box-shadow:none;background:var(--nav-hover,rgba(128,128,128,.14))}
+  .dd-menu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;background:transparent;padding:0 0 0 14px;max-height:0;overflow:hidden;transition:max-height .3s}
+  .dd.open .dd-menu{max-height:340px}
+  .dd-menu a{padding:13px 12px;font-size:16px}
+  .menu>a.nav-cta{margin:12px 0 0;justify-content:center}
+}
+
+/* =====================================================================
+   SCOOTER PAGE – identity: bright, clean, friendly. Soft off-white
+   canvas, white tiles with big radii, coral / teal / sun / periwinkle.
+   Everything lives in one bento grid with boxes of different sizes.
+   ===================================================================== */
+:root{
+  --bg:#f1f5fb; --panel:#ffffff; --line:#e0e7f1; --text:#16202e; --muted:#667389;
+  --accent:#ff5a3c;   /* coral  */
+  --accent2:#18b8a6;  /* teal   */
+  --accent3:#ffc233;  /* sun    */
+  --accent4:#6c7bff;  /* periwinkle */
+  --r:26px;
+  --font:"Nunito","Quicksand","Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  --nav-bg:rgba(255,255,255,.96); --nav-fg:#16202e; --nav-muted:#667389; --nav-pop:#fff; --nav-hover:rgba(255,90,60,.1); --nav-radius:999px; --nav-cta-fg:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{margin:0;line-height:1.05;letter-spacing:-.02em}
+.site-nav{box-shadow:0 1px 0 var(--line)}
+.nav-logo{font-weight:900;letter-spacing:-.01em;font-size:18px}
+@media(min-width:901px){.dd-menu{box-shadow:0 20px 50px rgba(30,50,90,.18)}}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+section{padding:28px 0}
+
+/* ---------- BENTO GRID ---------- */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:minmax(120px,auto);gap:16px}
+.box{background:var(--panel);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;box-shadow:0 1px 0 rgba(20,40,80,.04),0 10px 30px -14px rgba(30,50,90,.18);transition:transform .25s,box-shadow .25s}
+.box:hover{transform:translateY(-4px);box-shadow:0 18px 40px -14px rgba(30,50,90,.28)}
+.lbl{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lbl i{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;color:#fff;font-style:normal;font-size:14px;background:var(--c,var(--accent))}
+.big{font-size:clamp(40px,5vw,64px);font-weight:900;letter-spacing:-.04em;line-height:1}
+.big small{font-size:.35em;font-weight:800;margin-left:4px;color:var(--muted);letter-spacing:0}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+.swap{transition:opacity .2s,transform .2s}
+.swap.out{opacity:0;transform:translateY(8px)}
+
+/* hero tile */
+.hero{grid-column:span 4;grid-row:span 3;background:linear-gradient(135deg,#ff6a45 0%,#ff5a3c 45%,#ff8a5c 100%);color:#fff;padding:34px;display:flex;flex-direction:column;justify-content:space-between;min-height:430px}
+.hero::before{content:"";position:absolute;right:-90px;top:-90px;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.14)}
+.hero::after{content:"";position:absolute;right:120px;bottom:-140px;width:320px;height:320px;border-radius:50%;background:rgba(255,194,51,.35)}
+.hero .tag{align-self:flex-start;background:rgba(255,255,255,.22);padding:6px 14px;border-radius:99px;font-weight:800;font-size:13px;backdrop-filter:blur(4px);position:relative;z-index:1}
+.hero h1{font-size:clamp(42px,6.2vw,84px);font-weight:900;max-width:520px;position:relative;z-index:1;margin-top:14px}
+.hero p{max-width:420px;font-size:17px;margin:14px 0 0;position:relative;z-index:1;color:#fff4ee}
+.hero .scoot{position:absolute;right:-30px;bottom:6px;width:min(500px,54%);z-index:1;animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.hero .go{position:relative;z-index:2;align-self:flex-start;margin-top:22px;background:#fff;color:var(--accent);font-weight:900;padding:13px 24px;border-radius:99px;font-size:15px;transition:transform .15s}
+.hero .go:hover{transform:scale(1.05)}
+
+/* filter tile */
+.filter{grid-column:span 2;grid-row:span 1;background:#16202e;color:#fff}
+.filter .lbl{color:#9fb0c7}
+.chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip{font:inherit;font-weight:900;font-size:16px;padding:11px 16px;border-radius:99px;border:2px solid #34445c;background:transparent;color:#fff;cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--accent3)}
+.chip.on{background:var(--accent3);border-color:var(--accent3);color:#1a1300}
+.filter .models{font-size:13px;color:#b9c6d9;margin:12px 0 0}
+
+/* feature tiles */
+.store{grid-column:span 2;grid-row:span 2;background:#e9f9f6}
+.store .lbl{--c:var(--accent2)}
+.helm{display:flex;gap:6px;margin:16px 0 4px;align-items:flex-end;height:56px}
+.helm span{flex:1;max-width:44px;height:100%;opacity:0;transform:scale(.6);transition:all .35s;transform-origin:bottom}
+.helm span.on{opacity:1;transform:none}
+.helm svg{width:100%;height:100%}
+.fuel{grid-column:span 2;background:#fff7e2}
+.fuel .lbl{--c:#f0a400}
+.bar{height:14px;border-radius:99px;background:#ffe8a8;margin-top:14px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffc233,#ff8a1f);width:0;transition:width .8s cubic-bezier(.2,.9,.2,1)}
+.usb{grid-column:span 2;background:#eef0ff}
+.usb .lbl{--c:var(--accent4)}
+.ports{display:flex;gap:10px;margin-top:14px;align-items:center}
+.port{width:54px;height:30px;border-radius:9px;background:#fff;border:2px solid #c9ceff;position:relative;display:grid;place-items:center}
+.port::after{content:"";width:30px;height:9px;background:#6c7bff;border-radius:3px}
+.port.usbc::after{width:26px;border-radius:99px}
+.port.pulse{animation:pp 1.6s ease-in-out infinite}
+@keyframes pp{50%{box-shadow:0 0 0 6px rgba(108,123,255,.2)}}
+.ports b{font-size:13px;color:var(--accent4)}
+.power{grid-column:span 2;background:#fff}
+.power .lbl{--c:var(--accent)}
+.smart{grid-column:span 2;background:#ffe9e3}
+.smart .lbl{--c:#ff7a5c}
+.mini{grid-column:span 1;padding:18px;display:flex;flex-direction:column;justify-content:space-between;min-height:130px}
+.mini .big{font-size:clamp(28px,3.2vw,40px)}
+.mini.a{background:#fff}.mini.b{background:#e9f9f6}.mini.c{background:#eef0ff}.mini.d{background:#fff7e2}
+
+/* ---------- COMMUTE vs TOURING ---------- */
+.setup{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.s-head{grid-column:span 6;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:30px 4px 4px}
+.s-head h2{font-size:clamp(34px,5vw,60px);font-weight:900}
+.s-head h2 em{font-style:normal;color:var(--accent)}
+.seg{display:inline-flex;background:#fff;border-radius:99px;padding:5px;box-shadow:0 8px 24px -12px rgba(30,50,90,.25)}
+.seg button{font:inherit;font-weight:900;font-size:14px;padding:11px 20px;border-radius:99px;border:0;background:none;color:var(--muted);cursor:pointer;transition:all .25s}
+.seg button.on{background:var(--accent);color:#fff}
+.seg button.on.t{background:var(--accent4)}
+.map{grid-column:span 4;grid-row:span 2;padding:0;background:linear-gradient(180deg,#dff1ff,#f3faff);min-height:340px}
+.map svg{width:100%;height:100%;display:block}
+.route{fill:none;stroke:var(--rc,#ff5a3c);stroke-width:5;stroke-linecap:round;stroke-dasharray:2 12;transition:stroke .4s}
+.stops text{font:800 12px var(--font);fill:#16202e}
+.rider-dot{fill:var(--rc,#ff5a3c)}
+.setup-info{grid-column:span 2;grid-row:span 2;display:flex;flex-direction:column;gap:10px}
+.setup-info h3{font-size:26px;font-weight:900}
+.chk{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:8px}
+.chk li{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.chk li::before{content:"✓";flex:none;width:24px;height:24px;border-radius:50%;background:var(--rc,#ff5a3c);color:#fff;font-weight:900;font-size:13px;display:grid;place-items:center;margin-top:1px}
+.stat{grid-column:span 2;display:flex;flex-direction:column;justify-content:center;min-height:116px}
+.stat .big{font-size:40px}
+.acc{grid-column:span 6;display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:#16202e;color:#fff;border-radius:var(--r);padding:18px 22px}
+.acc>span{font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#9fb0c7;margin-right:6px}
+.acc button{font:inherit;font-weight:800;font-size:14px;padding:9px 16px;border-radius:99px;border:2px solid #34445c;background:none;color:#fff;cursor:pointer;transition:all .2s}
+.acc button.on{background:var(--accent3);color:#1a1300;border-color:var(--accent3)}
+.hot{cursor:pointer}
+.hot circle{fill:#fff;stroke:var(--rc,#ff5a3c);stroke-width:3;transition:all .25s}
+.hot.on circle{fill:var(--rc,#ff5a3c)}
+.hot text{font:900 12px var(--font);text-anchor:middle;fill:#16202e;pointer-events:none}
+.hot.on text{fill:#fff}
+.hot-lab{font:800 13px var(--font);fill:#16202e;opacity:0;transition:opacity .3s}
+.hot-lab.on{opacity:1}
+
+footer{padding:34px 0 40px;color:var(--muted);font-size:14px;text-align:center}
+footer a{color:var(--text);font-weight:800;margin:0 8px}
+.reveal{opacity:0;transform:translateY(22px) scale(.97);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- responsive bento ---------- */
+@media(max-width:980px){
+  .bento{grid-template-columns:repeat(4,1fr)}
+  .hero{grid-column:span 4;min-height:400px}
+  .filter,.store,.fuel,.usb,.power,.smart{grid-column:span 2}
+  .store{grid-row:span 1}
+  .mini{grid-column:span 1}
+  .map{grid-column:span 6}.setup-info{grid-column:span 6;grid-row:auto}.stat{grid-column:span 3}
+}
+@media(max-width:560px){
+  .bento{grid-template-columns:repeat(2,1fr);gap:12px}
+  .hero,.filter,.store,.fuel,.usb,.power,.smart{grid-column:span 2}
+  .mini{grid-column:span 1}
+  .hero{padding:24px;min-height:430px}
+  .hero .scoot{width:92%;right:-20px;bottom:0}
+  .hero h1{font-size:44px}
+  .setup{gap:12px}
+  .stat{grid-column:span 6}
+  .acc{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- ===== SHARED NAVBAR: Brands dropdown + category links + mobile menu ===== -->
+<header class="site-nav" id="siteNav">
+  <div class="nav-in">
+    <a class="nav-logo" href="home.html">BIG<b>BIKE</b> WORLD</a>
+    <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
+    <nav class="menu" id="navMenu" aria-label="Main">
+      <a href="home.html">Home</a>
+      <div class="dd">
+        <button class="dd-btn" type="button" aria-haspopup="true" aria-expanded="false">Brands
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="dd-menu" role="menu"><a href="honda.html" role="menuitem" style="--c:#e60012"><i></i>Honda</a><a href="yamaha.html" role="menuitem" style="--c:#4a74ff"><i></i>Yamaha</a><a href="suzuki.html" role="menuitem" style="--c:#4a8bff"><i></i>Suzuki</a><a href="bmw.html" role="menuitem" style="--c:#2d8cff"><i></i>BMW</a><a href="kawasaki.html" role="menuitem" style="--c:#5bd10a"><i></i>Kawasaki</a></div>
+      </div>
+      <a href="sport.html">Sport Bike</a><a href="naked.html">Naked Bike</a><a href="scooter.html" class="on" aria-current="page">Scooter</a>
+      <a class="nav-cta" href="cbr250rr.html">Exploded view →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Shared scooter drawing, facing left -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="sc-body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e8edf5"/></linearGradient>
+    <linearGradient id="sc-acc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd25f"/><stop offset="1" stop-color="#ffa81f"/></linearGradient>
+    <g id="sc-wheel"><circle r="44" fill="#1b2230"/><circle r="30" fill="#e9eef6"/><circle r="30" fill="none" stroke="#c4cddb" stroke-width="3"/><g stroke="#aab4c6" stroke-width="3"><line y1="-24" y2="24"/><line x1="-24" x2="24"/><line x1="-17" y1="-17" x2="17" y2="17"/><line x1="17" y1="-17" x2="-17" y2="17"/></g><circle r="7" fill="#8693a8"/></g>
+    <g id="sc">
+      <ellipse cx="300" cy="238" rx="250" ry="8" fill="#16202e" opacity=".15"/>
+      <use href="#sc-wheel" x="96" y="198"/>
+      <use href="#sc-wheel" x="468" y="198"/>
+      <!-- rear body + engine unit -->
+      <path d="M380 150 Q440 140 500 130 Q520 128 524 150 L520 190 Q470 196 410 196 Z" fill="url(#sc-body)" stroke="#cdd5e2" stroke-width="2"/>
+      <path d="M404 168 L490 160" stroke="#ff5a3c" stroke-width="6" stroke-linecap="round"/>
+      <rect x="396" y="190" width="100" height="22" rx="11" fill="#2a3242"/>
+      <!-- floorboard + under-seat -->
+      <path d="M150 190 L380 192 L380 214 Q260 222 160 214 Z" fill="#ff5a3c"/>
+      <path d="M150 190 L380 192" stroke="#ff8a6e" stroke-width="3"/>
+      <!-- seat -->
+      <path d="M270 118 Q340 100 440 100 Q500 100 520 114 L516 128 Q430 132 330 134 Q280 134 264 128 Z" fill="#222a3a"/>
+      <path d="M284 112 Q350 104 440 104" stroke="rgba(255,255,255,.3)" stroke-width="3" fill="none"/>
+      <!-- leg shield / front -->
+      <path d="M126 70 Q170 60 192 92 L240 190 L190 192 Q150 140 124 96 Z" fill="url(#sc-body)" stroke="#cdd5e2" stroke-width="2"/>
+      <path d="M96 198 Q100 150 126 100 L150 120 Q130 160 134 198 Z" fill="#ff5a3c"/>
+      <path d="M126 70 Q160 56 186 62 L196 80 Q164 76 136 92 Z" fill="#ffffff" stroke="#cdd5e2" stroke-width="2"/>
+      <!-- fork -->
+      <line x1="150" y1="84" x2="102" y2="198" stroke="#8693a8" stroke-width="9" stroke-linecap="round"/>
+      <!-- screen, bars, headlight -->
+      <path d="M156 70 L186 22 Q214 28 206 58 L180 74 Z" fill="rgba(108,123,255,.28)" stroke="#6c7bff" stroke-width="2"/>
+      <rect x="140" y="62" width="40" height="12" rx="6" fill="#222a3a"/>
+      <path d="M128 78 q-18 2 -14 22 q8 6 22 -2 z" fill="#fff7c9" stroke="#e0b100" stroke-width="2"/>
+      <!-- tail light -->
+      <rect x="518" y="118" width="12" height="20" rx="5" fill="#ff3b4e"/>
+    </g>
+  </defs>
+</svg>
+
+<main class="wrap">
+
+<!-- ===== BENTO #1: hero + features, values driven by the cc filter ===== -->
+<section>
+  <div class="bento" id="bento">
+    <div class="box hero reveal">
+      <div>
+        <span class="tag">Scooters · Maxi-scooters</span>
+        <h1>Ride easy.<br>Go further.</h1>
+        <p>Step-through frames, a flat floor, automatic gearbox and room for your bag. The easiest way to move around a city, or across a country.</p>
+      </div>
+      <a class="go" href="#setup">Plan your week →</a>
+      <svg class="scoot" viewBox="40 10 520 250" aria-label="Scooter illustration" role="img"><use href="#sc"/></svg>
+    </div>
+
+    <div class="box filter reveal">
+      <span class="lbl"><i style="--c:#ffc233">⚙</i>Engine displacement</span>
+      <div class="chips" role="group" aria-label="Engine size"><button class="chip on" data-cc="150">150cc</button><button class="chip" data-cc="300">300cc</button><button class="chip" data-cc="750">750cc+</button></div>
+      <p class="models swap" id="models"></p>
+    </div>
+
+    <div class="box store reveal">
+      <span class="lbl"><i>▣</i>Under-seat storage</span>
+      <div class="big swap" id="vStore" style="margin-top:14px">28<small>litres</small></div>
+      <div class="helm" id="helm" aria-hidden="true"></div>
+      <p class="note swap" id="nStore"></p>
+    </div>
+
+    <div class="box fuel reveal">
+      <span class="lbl"><i>⛽</i>Fuel efficiency</span>
+      <div class="big swap" id="vKml" style="margin-top:14px">45<small>km/L</small></div>
+      <div class="bar"><i id="bKml"></i></div>
+      <p class="note swap" id="nKml"></p>
+    </div>
+
+    <div class="box usb reveal">
+      <span class="lbl"><i>⚡</i>USB charging</span>
+      <div class="ports" id="ports"></div>
+      <p class="note swap" id="nUsb"></p>
+    </div>
+
+    <div class="box power reveal">
+      <span class="lbl"><i>◎</i>Power</span>
+      <div class="big swap" id="vHp" style="margin-top:12px">15<small>hp</small></div>
+      <p class="note swap" id="nHp"></p>
+    </div>
+
+    <div class="box smart reveal">
+      <span class="lbl"><i>🔑</i>Smart key</span>
+      <div class="big swap" id="vKey" style="margin-top:12px;font-size:34px">Keyless</div>
+      <p class="note swap" id="nKey"></p>
+    </div>
+
+    <div class="box mini a reveal"><span class="lbl">Seat height</span><div class="big swap" id="vSeat">764<small>mm</small></div></div>
+    <div class="box mini b reveal"><span class="lbl">Weight</span><div class="big swap" id="vKg">130<small>kg</small></div></div>
+    <div class="box mini c reveal"><span class="lbl">Tank</span><div class="big swap" id="vTank">8<small>L</small></div></div>
+    <div class="box mini d reveal"><span class="lbl">Range</span><div class="big swap" id="vRange">360<small>km</small></div></div>
+  </div>
+</section>
+
+<!-- ===== BENTO #2: Daily commute vs Weekend touring ===== -->
+<section id="setup">
+  <div class="setup">
+    <div class="s-head reveal"><h2>Your <em id="hWord">daily commute</em><br>setup</h2>
+      <div class="seg" role="group" aria-label="Ride type"><button class="on" data-s="commute">Daily commute</button><button class="t" data-s="tour">Weekend touring</button></div></div>
+
+    <div class="box map reveal" id="mapBox">
+      <svg viewBox="0 0 700 380" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Route map">
+        <rect width="700" height="380" fill="#eaf5ff"/>
+        <g id="bg" opacity=".9"></g>
+        <path id="routePath" class="route" d=""/>
+        <g class="stops" id="stops"></g>
+        <circle class="rider-dot" id="dot" r="9"/>
+        <circle id="dotRing" r="16" fill="none" stroke="var(--rc,#ff5a3c)" stroke-width="2" opacity=".35"/>
+        <g transform="translate(250,215) scale(.5)" id="bikeOnMap"><use href="#sc"/><g id="hots"></g></g>
+        <text id="hotLab" class="hot-lab" x="30" y="360"></text>
+      </svg>
+    </div>
+
+    <div class="box setup-info reveal">
+      <span class="lbl" id="sLbl"></span>
+      <h3 id="sTitle"></h3>
+      <p class="note" id="sText" style="margin:0"></p>
+      <ul class="chk" id="chk"></ul>
+    </div>
+
+    <div class="box stat reveal"><span class="lbl">Distance</span><div class="big" id="sDist"></div></div>
+    <div class="box stat reveal" style="background:#e9f9f6"><span class="lbl">Fuel per trip</span><div class="big" id="sFuel"></div></div>
+    <div class="box stat reveal" style="background:#fff7e2"><span class="lbl">Best engine size</span><div class="big" id="sCc"></div></div>
+
+    <div class="acc reveal" id="acc"><span>Add-ons</span></div>
+  </div>
+</section>
+
+</main>
+
+<footer><a href="home.html">Home</a><a href="sport.html">Sport Bike</a><a href="naked.html">Naked Bike</a><p>Example page · all figures are rounded typical values · no logos used.</p></footer>
+
+<script>
+
+// ===== NAVBAR behaviour: dropdown, mobile menu, Esc / outside click to close =====
+(function(){
+  const nav = document.getElementById('siteNav'); if (!nav) return;
+  const burger = nav.querySelector('.burger'), menu = nav.querySelector('.menu');
+  const dds = [...nav.querySelectorAll('.dd')];
+  function closeDropdowns(){ dds.forEach(d => { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded','false'); }); }
+  function closeMenu(){ menu.classList.remove('open'); burger.setAttribute('aria-expanded','false'); burger.setAttribute('aria-label','Open menu'); document.body.classList.remove('nav-lock'); }
+  burger.addEventListener('click', () => {
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open); burger.setAttribute('aria-expanded', open);
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('nav-lock', open);
+  });
+  dds.forEach(d => {
+    const b = d.querySelector('.dd-btn');
+    b.addEventListener('click', e => { e.stopPropagation(); const open = !d.classList.contains('open'); closeDropdowns(); d.classList.toggle('open', open); b.setAttribute('aria-expanded', open); });
+  });
+  document.addEventListener('click', e => { if (!nav.contains(e.target)) closeDropdowns(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ closeDropdowns(); closeMenu(); } });
+  matchMedia('(min-width:901px)').addEventListener('change', e => { if (e.matches) closeMenu(); });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+})();
+
+
+// ===================================================================
+// 1) DISPLACEMENT FILTER – one data object per engine class.
+//    Every value below is a typical figure for the class.
+// ===================================================================
+const CC = {
+  150:{models:'PCX160 · NMAX 155 · Vespa Primavera 150', store:28, kml:45, hp:15, seat:764, kg:130, tank:8, range:360, usb:1, key:'Optional',
+       nStore:'Fits one full-face helmet plus a light jacket.', nKml:'Sips fuel in daily traffic.', nUsb:'Often a single port in the glovebox.', nHp:'Enough for city speeds and short highways.', nKeyT:'Many models offer an optional keyless system.'},
+  300:{models:'Forza 350 · XMAX 300 · Vespa GTS 300', store:48, kml:30, hp:30, seat:780, kg:190, tank:12, range:340, usb:2, key:'Smart key',
+       nStore:'Big enough for two helmets or a weekend bag.', nKml:'Balanced fuel use at highway pace.', nUsb:'Two ports, often USB-C.', nHp:'Comfortable overtaking on motorways.', nKeyT:'Smart key is standard on most.'},
+  750:{models:'X-ADV 750 · Forza 750', store:22, kml:22, hp:58, seat:820, kg:236, tank:13, range:300, usb:2, key:'Smart key',
+       nStore:'Less room under the seat, but dual-purpose chassis.', nKml:'Thirstier, but built for the long haul.', nUsb:'USB-C and a 12 V socket.', nHp:'Real touring power; passes with ease.', nKeyT:'Keyless, with cruise control and traction control.'}
+};
+const MAXSTORE = 50, MAXKML = 50;
+let cc = 150;
+const $ = id => document.getElementById(id);
+
+// helmet icons in the storage tile (each icon = ~10 L, rounded)
+const helmSvg = '<svg viewBox="0 0 40 40"><path d="M6 24 Q6 8 22 8 Q36 8 36 22 L36 28 Q36 32 32 32 L10 32 Q6 32 6 28 Z" fill="#18b8a6"/><path d="M20 14 Q34 14 34 24 L20 24 Z" fill="#0b6d62"/></svg>';
+$('helm').innerHTML = Array.from({length:5}, () => `<span>${helmSvg}</span>`).join('');
+
+function set(el, html){ // small fade-swap when a value changes
+  el.classList.add('out'); setTimeout(() => { el.innerHTML = html; el.classList.remove('out'); }, 180);
+}
+function applyCC(){
+  const d = CC[cc];
+  set($('models'), d.models);
+  set($('vStore'), `${d.store}<small>litres</small>`); set($('nStore'), d.nStore);
+  set($('vKml'), `${d.kml}<small>km/L</small>`); set($('nKml'), d.nKml); $('bKml').style.width = (d.kml / MAXKML * 100) + '%';
+  set($('vHp'), `${d.hp}<small>hp</small>`); set($('nHp'), d.nHp);
+  set($('vKey'), d.key); set($('nKey'), d.nKeyT);
+  set($('vSeat'), `${d.seat}<small>mm</small>`); set($('vKg'), `${d.kg}<small>kg</small>`);
+  set($('vTank'), `${d.tank}<small>L</small>`); set($('vRange'), `${d.range}<small>km</small>`);
+  // helmets: about one per 10 litres, 2–5 icons
+  const n = Math.max(1, Math.min(5, Math.round(d.store / 10)));
+  document.querySelectorAll('#helm span').forEach((s, i) => s.classList.toggle('on', i < n));
+  // USB ports
+  $('ports').innerHTML = Array.from({length:d.usb}, (_, i) => `<div class="port ${i ? 'usbc' : ''} pulse"></div>`).join('') + `<b>${d.usb} port${d.usb > 1 ? 's' : ''}</b>`;
+  set($('nUsb'), d.nUsb);
+}
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+  cc = +c.dataset.cc; document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); applyCC();
+}));
+
+// ===================================================================
+// 2) COMMUTE vs TOURING infographic
+// ===================================================================
+const SETUP = {
+  commute:{rc:'#ff5a3c', word:'daily commute', lbl:'Mon – Fri', title:'City commuter setup', text:'Short hops, tight traffic, lots of stops. Small and light wins.',
+    list:['Top box for laptop or helmet','Phone holder + USB charging','Windshield for rain and chill','Disc lock for the parking spot','Rain cover for the seat'],
+    dist:'18 km', fuel:'0.4 L', ccBest:'150cc', path:'M40 330 C140 330 150 250 230 250 S330 150 420 150 S560 90 660 70',
+    stops:[['Home',40,330],['Café',230,250],['Station',420,150],['Office',660,70]],
+    acc:['Top box','Phone holder','Windshield','Disc lock','Rain cover']},
+  tour:{rc:'#6c7bff', word:'weekend touring', lbl:'Sat – Sun', title:'Weekend tourer setup', text:'Long straight roads, mountain curves and a full load. Space and comfort matter.',
+    list:['Tall touring screen for the chest','Side cases or a large top box','Cruise control + comfy seat','Heated grips for cool mornings','Tyre repair kit and a pump'],
+    dist:'320 km', fuel:'11 L', ccBest:'300cc / 750cc+', path:'M40 320 C120 300 180 220 120 170 S260 60 360 120 S420 280 520 250 S640 140 660 70',
+    stops:[['Start',40,320],['Viewpoint',120,170],['Lunch',360,120],['Lake',520,250],['Camp',660,70]],
+    acc:['Touring screen','Side cases','Cruise control','Heated grips','Tyre kit']}
+};
+// accessories shown as hotspots on the little scooter on the map: x,y in scooter coords (viewBox 40..560)
+const HOT = [[190,40,'Windshield'],[510,96,'Top box'],[310,120,'Seat / cruise comfort'],[120,70,'Phone + USB'],[420,205,'Side cases / lock']];
+let mode = 'commute', hotOn = -1;
+function drawBg(){ // soft city/mountain blobs
+  let g = ''; const r = (a, b) => a + Math.random() * (b - a);
+  for (let i = 0; i < 9; i++) g += `<rect x="${i * 80 + 6}" y="${r(240, 330)}" width="62" height="140" rx="10" fill="#d4e6f6"/>`;
+  g += '<circle cx="610" cy="60" r="34" fill="#ffe08a"/>'; $('bg').innerHTML = g;
+}
+function applySetup(){
+  const s = SETUP[mode];
+  document.documentElement.style.setProperty('--rc', s.rc);
+  $('hWord').textContent = s.word; $('hWord').style.color = s.rc;
+  $('sLbl').textContent = s.lbl; $('sTitle').textContent = s.title; $('sText').textContent = s.text;
+  $('chk').innerHTML = s.list.map(x => `<li>${x}</li>`).join('');
+  $('sDist').textContent = s.dist; $('sFuel').textContent = s.fuel; $('sCc').innerHTML = `<span style="font-size:30px">${s.ccBest}</span>`;
+  $('routePath').setAttribute('d', s.path);
+  $('stops').innerHTML = s.stops.map(p => `<g><circle cx="${p[1]}" cy="${p[2]}" r="8" fill="#fff" stroke="${s.rc}" stroke-width="4"/><text x="${p[1] > 600 ? p[1] - 14 : p[1] + 14}" text-anchor="${p[1] > 600 ? 'end' : 'start'}" y="${p[2] - 12}">${p[0]}</text></g>`).join('');
+  $('acc').innerHTML = '<span>Add-ons</span>' + s.acc.map((a, i) => `<button data-i="${i}">${a}</button>`).join('');
+  document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.s === mode));
+  document.querySelector('.seg button.on').style.background = s.rc;
+  document.querySelectorAll('.seg button:not(.on)').forEach(b => b.style.background = '');
+  hotOn = -1; $('hotLab').textContent = ''; drawHots(); restartDot();
+}
+function drawHots(){
+  $('hots').innerHTML = HOT.map((h, i) => `<g class="hot ${i === hotOn ? 'on' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${h[2]}"><circle cx="${h[0]}" cy="${h[1]}" r="15"/><text x="${h[0]}" y="${h[1] + 4}">${i + 1}</text></g>`).join('');
+}
+$('hots').addEventListener('click', e => { const h = e.target.closest('.hot'); if (!h) return; hotOn = +h.dataset.i; drawHots(); $('hotLab').textContent = (hotOn + 1) + ' · ' + HOT[hotOn][2]; $('hotLab').classList.add('on'); });
+$('acc').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; b.classList.toggle('on'); });
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => { mode = b.dataset.s; applySetup(); }));
+
+// animated dot moving along the route path
+let raf, t0;
+function restartDot(){
+  cancelAnimationFrame(raf); t0 = performance.now(); const p = $('routePath'), len = p.getTotalLength(), dot = $('dot'), ring = $('dotRing');
+  (function step(t){ const u = ((t - t0) / 7000) % 1, pt = p.getPointAtLength(len * u); dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); ring.setAttribute('cx', pt.x); ring.setAttribute('cy', pt.y); raf = requestAnimationFrame(step); })(t0);
+}
+// the bike on the map sits at the bottom-left so it doesn't hide the route
+$('bikeOnMap').setAttribute('transform', 'translate(210,250) scale(.38)');
+
+// reveal on scroll + start up
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+drawBg(); applyCC(); applySetup();
+</script>
+</body>
+</html>
